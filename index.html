@@ -1,0 +1,1782 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AMC 10 Daily Math Practice — 100 Shuffled Problems</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Inter & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <!-- KaTeX CSS & JS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          colors: {
+            navy: {
+              800: '#1e3a5f',
+              900: '#132640',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #f8fafc;
+      color: #0f172a;
+    }
+    .katex {
+      font-size: 1.06em;
+    }
+    .katex-display {
+      margin: 0.85em 0;
+      overflow-x: auto;
+      overflow-y: hidden;
+    }
+    /* Custom scrollbar for grid & scratchpad */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #f1f5f9;
+      border-radius: 999px;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col bg-slate-50 text-slate-900 selection:bg-indigo-100 selection:text-indigo-900">
+
+  <!-- Top Navigation & Daily Progress Header -->
+  <header class="sticky top-0 z-30 bg-white/95 backdrop-blur border-b border-slate-200 shadow-sm">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-3">
+      <!-- Brand -->
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-navy-900 text-white flex items-center justify-center font-extrabold text-lg shadow-sm">
+          10
+        </div>
+        <div>
+          <h1 class="text-base sm:text-lg font-bold tracking-tight text-slate-900 leading-tight">AMC 10 Daily Practice</h1>
+          <p class="text-xs text-slate-500 hidden sm:block">100 Shuffled Problems &bull; No-Spoiler Test Mode</p>
+        </div>
+      </div>
+
+      <!-- Daily Goal & Streak Badges -->
+      <div class="flex items-center gap-2 sm:gap-3 flex-wrap">
+        <!-- Daily 2-Question Goal -->
+        <div id="dailyGoalBadge" class="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-indigo-50 border border-indigo-200 text-indigo-900 text-xs sm:text-sm font-medium">
+          <span class="inline-flex h-2.5 w-2.5 rounded-full bg-indigo-600" id="dailyDot"></span>
+          <span>Today's Goal: <strong id="dailyCountText">0/2</strong></span>
+          <button id="jumpDailyBtn" class="ml-1 text-xs font-semibold underline text-indigo-700 hover:text-indigo-950 focus:outline-none">
+            Go to Set
+          </button>
+        </div>
+
+        <!-- Streak Counter -->
+        <div class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 text-xs sm:text-sm font-medium" title="Consecutive days completing 2 questions">
+          <svg class="w-4 h-4 text-amber-500 fill-amber-500" viewBox="0 0 24 24"><path d="M12 2c.4 3.6-1.4 5.7-3.2 7.6C7.1 11.4 6 13.1 6 15.5 6 19.1 8.7 22 12 22s6-2.9 6-6.5c0-2.6-1.3-4.6-2.7-6.3-.4-.5-.9-1-1.3-1.6-.4 1.4-1.3 2.3-2.3 2.7.5-2.6.8-5.3.3-8.3z"/></svg>
+          <span><strong id="streakCountText">0</strong>d streak</span>
+        </div>
+
+        <!-- Overall Score Pill -->
+        <div class="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-100 border border-slate-200 text-slate-700 text-xs sm:text-sm font-medium">
+          <span>Solved: <strong id="overallSolvedText" class="text-slate-900">0/100</strong></span>
+          <span class="text-slate-300">|</span>
+          <span>Accuracy: <strong id="overallAccText" class="text-emerald-700">—</strong></span>
+        </div>
+
+        <!-- Toggle Grid Map Button -->
+        <button id="toggleGridBtn" class="p-2 sm:px-3 sm:py-1.5 rounded-xl bg-slate-900 text-white hover:bg-slate-800 text-xs sm:text-sm font-medium flex items-center gap-1.5 transition shadow-sm">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+          <span class="hidden sm:inline">1–100 Map</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Collapsible 1-100 Question Grid Map Drawer -->
+  <section id="gridDrawer" class="hidden bg-white border-b border-slate-200 shadow-inner">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 py-5">
+      <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+        <div class="flex flex-wrap items-center gap-2">
+          <h2 class="text-sm font-bold text-slate-800 uppercase tracking-wider mr-2">Question Navigator</h2>
+          <div class="inline-flex rounded-xl bg-slate-100 p-1 text-xs font-medium" id="filterTabs">
+            <button data-filter="all" class="filter-btn px-3 py-1.5 rounded-lg bg-white text-slate-900 shadow-sm transition">All (100)</button>
+            <button data-filter="unanswered" class="filter-btn px-3 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 transition">Unanswered</button>
+            <button data-filter="missed" class="filter-btn px-3 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 transition">Missed</button>
+            <button data-filter="mastered" class="filter-btn px-3 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 transition">Mastered</button>
+            <button data-filter="flagged" class="filter-btn px-3 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 transition">Flagged</button>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-4 text-xs text-slate-600">
+          <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-slate-100 border border-slate-300 inline-block"></span> Unanswered</span>
+          <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-emerald-500 inline-block"></span> Correct</span>
+          <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-rose-500 inline-block"></span> Incorrect</span>
+          <button id="openResetModalBtn" class="ml-2 text-rose-600 hover:text-rose-800 font-semibold underline">Reset Progress</button>
+        </div>
+      </div>
+
+      <!-- 100-Number Grid -->
+      <div id="questionGrid" class="grid grid-cols-10 sm:grid-cols-15 md:grid-cols-20 gap-1.5 max-h-64 overflow-y-auto p-1">
+        <!-- Populated dynamically -->
+      </div>
+    </div>
+  </section>
+
+  <!-- Main Workspace -->
+  <main class="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 py-6 sm:py-8">
+    <!-- Top Controls Bar -->
+    <div class="flex flex-wrap items-center justify-between gap-3 mb-5">
+      <div class="flex items-center gap-2">
+        <button id="prevBtn" class="px-3.5 py-2 rounded-xl bg-white border border-slate-200 hover:bg-slate-100 text-slate-700 text-sm font-medium flex items-center gap-1.5 shadow-sm transition disabled:opacity-40">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
+          Prev
+        </button>
+        <button id="nextBtn" class="px-3.5 py-2 rounded-xl bg-white border border-slate-200 hover:bg-slate-100 text-slate-700 text-sm font-medium flex items-center gap-1.5 shadow-sm transition disabled:opacity-40">
+          Next
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+        </button>
+        <button id="randomBtn" class="px-3.5 py-2 rounded-xl bg-white border border-slate-200 hover:bg-indigo-50 hover:border-indigo-200 text-indigo-700 text-sm font-medium flex items-center gap-1.5 shadow-sm transition">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+          Random Unsolved
+        </button>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <button id="toggleScratchpadBtn" class="px-3.5 py-2 rounded-xl bg-white border border-slate-200 hover:bg-slate-100 text-slate-700 text-sm font-medium flex items-center gap-1.5 shadow-sm transition">
+          <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+          <span>Scratchpad</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Content Split: Problem Card + Optional Scratchpad -->
+    <div id="workspaceGrid" class="grid grid-cols-1 gap-6 items-start">
+      <!-- Primary Problem Card -->
+      <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+        <!-- Card Header -->
+        <div class="px-6 py-4 bg-slate-50/80 border-b border-slate-200 flex flex-wrap items-center justify-between gap-3">
+          <div class="flex items-center gap-3">
+            <span id="problemNumberBadge" class="text-lg font-extrabold text-navy-900">Problem #1</span>
+            <span id="dailySetPill" class="hidden px-2.5 py-0.5 rounded-full text-xs font-semibold bg-indigo-100 text-indigo-800 border border-indigo-200">
+              Today's Daily Set
+            </span>
+          </div>
+
+          <!-- Hidden Spoiler Badges (Unveiled on Submit / Reveal) & Bookmark -->
+          <div class="flex items-center gap-2">
+            <div id="spoilerTagsContainer" class="flex items-center gap-2">
+              <span id="hiddenHintMask" class="px-2.5 py-1 rounded-lg bg-slate-200/70 text-slate-500 text-xs font-medium select-none flex items-center gap-1">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"/></svg>
+                Topic &amp; Difficulty Hidden
+              </span>
+              <span id="topicBadge" class="hidden px-2.5 py-1 rounded-lg bg-blue-50 text-blue-800 border border-blue-200 text-xs font-semibold"></span>
+              <span id="difficultyBadge" class="hidden px-2.5 py-1 rounded-lg text-xs font-semibold border"></span>
+            </div>
+
+            <button id="flagBtn" class="p-2 rounded-xl border border-slate-200 hover:bg-amber-50 text-slate-400 hover:text-amber-600 transition" title="Bookmark / Flag for Review">
+              <svg id="flagIcon" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Question Body -->
+        <div class="p-6 sm:p-8">
+          <div id="questionText" class="text-base sm:text-lg leading-relaxed text-slate-800 mb-7">
+            <!-- Rendered problem statement -->
+          </div>
+
+          <!-- Multiple Choice Options (A)-(E) -->
+          <div id="optionsContainer" class="space-y-3">
+            <!-- Rendered option buttons -->
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="mt-7 pt-5 border-t border-slate-100 flex flex-wrap items-center justify-between gap-3">
+            <div class="flex items-center gap-3">
+              <button id="submitBtn" class="px-6 py-2.5 rounded-xl bg-navy-900 hover:bg-navy-800 text-white font-semibold text-sm shadow-sm transition disabled:opacity-40 disabled:cursor-not-allowed">
+                Submit Answer
+              </button>
+              <button id="showSolutionBtn" class="px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium text-sm transition">
+                Show Solution
+              </button>
+            </div>
+
+            <div class="text-xs text-slate-400 hidden sm:block">
+              Shortcuts: <kbd class="px-1.5 py-0.5 bg-slate-100 border border-slate-300 rounded text-slate-600">A–E</kbd> select &bull; <kbd class="px-1.5 py-0.5 bg-slate-100 border border-slate-300 rounded text-slate-600">Enter</kbd> submit &bull; <kbd class="px-1.5 py-0.5 bg-slate-100 border border-slate-300 rounded text-slate-600">&larr;/&rarr;</kbd> navigate
+            </div>
+          </div>
+        </div>
+
+        <!-- Step-by-Step Solution Reveal Card ("Next-Page" equivalent) -->
+        <div id="solutionSection" class="hidden border-t-2 border-slate-200 bg-slate-50/90 p-6 sm:p-8">
+          <div id="resultBanner" class="mb-5 p-4 rounded-xl border flex items-center justify-between gap-3">
+            <!-- Filled dynamically with Correct / Incorrect / Revealed status -->
+          </div>
+
+          <div class="flex items-center justify-between mb-3">
+            <h3 class="text-base font-bold text-slate-900 uppercase tracking-wide flex items-center gap-2">
+              <span class="w-2 h-5 rounded-full bg-indigo-600 inline-block"></span>
+              Step-by-Step Solution
+            </h3>
+            <span id="correctLetterPill" class="px-3 py-1 rounded-lg bg-emerald-100 text-emerald-900 font-bold text-xs"></span>
+          </div>
+
+          <div id="solutionText" class="text-sm sm:text-base leading-relaxed text-slate-800 bg-white p-5 sm:p-6 rounded-xl border border-slate-200 shadow-xs">
+            <!-- Rendered solution -->
+          </div>
+
+          <div class="mt-5 flex justify-end">
+            <button id="nextAfterSolveBtn" class="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm shadow-sm flex items-center gap-2 transition">
+              Continue to Next Problem
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Optional Scratchpad / Notes Drawer -->
+      <aside id="scratchpadCard" class="hidden bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+        <div class="px-5 py-3.5 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <span class="text-sm font-bold text-slate-800">Scratchpad &amp; Work Notes</span>
+            <span class="text-xs text-slate-400">(Saved per problem)</span>
+          </div>
+          <button id="clearNoteBtn" class="text-xs text-slate-500 hover:text-rose-600 font-medium">Clear</button>
+        </div>
+        <div class="p-4">
+          <textarea id="scratchpadInput" rows="12" placeholder="Write equations, casework, or scratch calculations here..." class="w-full p-3 rounded-xl bg-slate-50 border border-slate-200 focus:bg-white focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 outline-none font-mono text-sm text-slate-800 resize-y"></textarea>
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  <!-- Custom Reset Confirmation Modal (No alert/confirm used) -->
+  <div id="resetModal" class="hidden fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl border border-slate-200">
+      <h3 class="text-lg font-bold text-slate-900 mb-2">Reset All Practice Progress?</h3>
+      <p class="text-sm text-slate-600 mb-6">This will clear your submitted answers, streak counter, daily goal progress, bookmarks, and scratchpad notes across all 100 questions. This action cannot be undone.</p>
+      <div class="flex justify-end gap-3">
+        <button id="cancelResetBtn" class="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-medium">Cancel</button>
+        <button id="confirmResetBtn" class="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-sm font-semibold">Yes, Reset Everything</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Complete 100-Question AMC 10 Bank (Shuffled Topics & Difficulties)
+    const PROBLEMS = [
+      {
+        id: 1,
+        topic: "Probability",
+        difficulty: "Easy",
+        question: "Two fair six-sided dice are rolled. What is the probability that the sum of the numbers rolled is $8$?",
+        options: ["$\\frac{1}{9}$", "$\\frac{5}{36}$", "$\\frac{1}{6}$", "$\\frac{7}{36}$", "$\\frac{2}{9}$"],
+        answer: 1,
+        solution: "There are $6 \\times 6 = 36$ equally likely outcomes when two dice are rolled. The ordered pairs $(d_1, d_2)$ that sum to $8$ are $$(2, 6), \\; (3, 5), \\; (4, 4), \\; (5, 3), \\; (6, 2).$$ There are $5$ favorable outcomes, so the probability is $\\frac{5}{36}$."
+      },
+      {
+        id: 2,
+        topic: "Algebra",
+        difficulty: "Challenging",
+        question: "Let $a, b, c$ be the roots of $x^3 - 4x^2 + 5x - 1 = 0$. What is the value of $a^2 + b^2 + c^2$?",
+        options: ["$4$", "$6$", "$8$", "$10$", "$12$"],
+        answer: 1,
+        solution: "By Vieta's formulas applied to $x^3 - 4x^2 + 5x - 1 = 0$, we have $a + b + c = 4$ and $ab + bc + ca = 5$. Therefore, $$a^2 + b^2 + c^2 = (a + b + c)^2 - 2(ab + bc + ca) = 4^2 - 2(5) = 16 - 10 = 6.$$"
+      },
+      {
+        id: 3,
+        topic: "Geometry",
+        difficulty: "Easy",
+        question: "A right triangle has legs of length $9$ and $12$. What is the length of the altitude drawn to the hypotenuse?",
+        options: ["$6.4$", "$7.2$", "$7.5$", "$8.0$", "$8.4$"],
+        answer: 1,
+        solution: "By the Pythagorean Theorem, the length of the hypotenuse is $$c = \\sqrt{9^2 + 12^2} = \\sqrt{81 + 144} = \\sqrt{225} = 15.$$ Expressing the area of the triangle in two ways—using the legs as base and height, and using the hypotenuse $c$ with its altitude $h$—gives $$\\frac{1}{2}(9)(12) = \\frac{1}{2}(15)(h) \\implies 108 = 15h \\implies h = \\frac{108}{15} = 7.2.$$"
+      },
+      {
+        id: 4,
+        topic: "Number Theory",
+        difficulty: "Medium",
+        question: "What is the remainder when $1! + 2! + 3! + \\dots + 100!$ is divided by $12$?",
+        options: ["$1$", "$3$", "$5$", "$7$", "$9$"],
+        answer: 4,
+        solution: "For every integer $k \\ge 4$, $k!$ contains the factors $4$ and $3$, so $k!$ is divisible by $12$. Therefore, $$1! + 2! + 3! + 4! + \\dots + 100! \\equiv 1! + 2! + 3! \\pmod{12}.$$ Computing the first three factorials gives $1 + 2 + 6 = 9$. Since $0 \\le 9 < 12$, the remainder is $9$."
+      },
+      {
+        id: 5,
+        topic: "Combinatorics",
+        difficulty: "Challenging",
+        question: "How many subsets $S$ of $\\{1, 2, 3, 4, 5, 6, 7, 8\\}$ contain no two consecutive integers?",
+        options: ["$34$", "$55$", "$64$", "$89$", "$144$"],
+        answer: 1,
+        solution: "Let $f(n)$ be the number of subsets of $\\{1, 2, \\dots, n\\}$ containing no two consecutive integers. For $n=1$: $\\emptyset, \\{1\\} \\implies f(1)=2$. For $n=2$: $\\emptyset, \\{1\\}, \\{2\\} \\implies f(2)=3$. For general $n \\ge 3$, a valid subset either excludes $n$ ($f(n-1)$ choices) or includes $n$ and excludes $n-1$ ($f(n-2)$ choices), giving $f(n) = f(n-1) + f(n-2)$. Computing sequentially: $f(3)=5, f(4)=8, f(5)=13, f(6)=21, f(7)=34, f(8)=55$."
+      },
+      {
+        id: 6,
+        topic: "Algebra",
+        difficulty: "Easy",
+        question: "What is the value of $\\dfrac{2026^2 - 2024^2}{2025}$?",
+        options: ["$2$", "$4$", "$8$", "$2025$", "$4050$"],
+        answer: 1,
+        solution: "Using the difference of squares factorization $a^2 - b^2 = (a - b)(a + b)$ with $a = 2026$ and $b = 2024$, we obtain $$2026^2 - 2024^2 = (2026 - 2024)(2026 + 2024) = 2 \\times 4050.$$ Dividing by $2025$ gives $$\\frac{2 \\times 4050}{2025} = 2 \\times 2 = 4.$$"
+      },
+      {
+        id: 7,
+        topic: "Geometry",
+        difficulty: "Challenging",
+        question: "Three mutually tangent circles of radius $1$ are externally tangent to each other. A larger circle surrounds all three and is internally tangent to each of them. What is the radius of the large circle?",
+        options: ["$1 + \\frac{\\sqrt{3}}{3}$", "$1 + \\frac{2\\sqrt{3}}{3}$", "$2$", "$1 + \\sqrt{3}$", "$2 + \\frac{\\sqrt{3}}{3}$"],
+        answer: 1,
+        solution: "The centers $O_1, O_2, O_3$ of the three unit circles form an equilateral triangle of side length $1 + 1 = 2$. The center $O$ of the circumscribing circle coincides with the centroid of $\\triangle O_1O_2O_3$. The distance from the centroid of an equilateral triangle of side length $2$ to each vertex is $$OO_1 = \\frac{2}{\\sqrt{3}} = \\frac{2\\sqrt{3}}{3}.$$ Extending the segment $OO_1$ by the radius $1$ of the small circle gives the radius of the large circle: $$R = 1 + \\frac{2\\sqrt{3}}{3}.$$"
+      },
+      {
+        id: 8,
+        topic: "Number Theory",
+        difficulty: "Easy",
+        question: "How many positive divisors does the integer $360$ have?",
+        options: ["$18$", "$20$", "$24$", "$28$", "$30$"],
+        answer: 2,
+        solution: "First, find the prime factorization of $360$: $$360 = 36 \\times 10 = (2^2 \\cdot 3^2)(2 \\cdot 5) = 2^3 \\cdot 3^2 \\cdot 5^1.$$ The number of positive divisors is obtained by adding $1$ to each exponent and multiplying: $$(3 + 1)(2 + 1)(1 + 1) = 4 \\times 3 \\times 2 = 24.$$"
+      },
+      {
+        id: 9,
+        topic: "Probability",
+        difficulty: "Medium",
+        question: "Roll a standard fair six-sided die repeatedly until a $6$ appears. What is the probability that the first $6$ appears on an odd-numbered roll (1st, 3rd, 5th, $\\dots$)?",
+        options: ["$\\frac{1}{2}$", "$\\frac{5}{11}$", "$\\frac{6}{11}$", "$\\frac{7}{12}$", "$\\frac{2}{3}$"],
+        answer: 2,
+        solution: "Let $p$ be the desired probability. On the first roll, we succeed immediately with probability $\\frac{1}{6}$, or fail with probability $\\frac{5}{6}$. If we fail on roll 1, then on roll 2 we must also fail (probability $\\frac{5}{6}$) so that the game resets to an odd-numbered roll (roll 3) with the same probability $p$. Thus, $$p = \\frac{1}{6} + \\left(\\frac{5}{6}\\right)^2 p = \\frac{1}{6} + \\frac{25}{36}p.$$ Solving for $p$ gives $\\frac{11}{36}p = \\frac{1}{6}$, so $p = \\frac{6}{11}$."
+      },
+      {
+        id: 10,
+        topic: "Algebra",
+        difficulty: "Easy",
+        question: "If $2^x = 5$ and $5^y = 8$, what is the value of $xy$?",
+        options: ["$2$", "$3$", "$4$", "$\\log_2 5$", "$\\frac{5}{2}$"],
+        answer: 1,
+        solution: "Raise both sides of the equation $2^x = 5$ to the power $y$: $$(2^x)^y = 5^y.$$ Using exponent rules on the left-hand side and substituting $5^y = 8$ on the right-hand side gives $$2^{xy} = 8 = 2^3.$$ Equating exponents yields $xy = 3$."
+      },
+      {
+        id: 11,
+        topic: "Combinatorics",
+        difficulty: "Challenging",
+        question: "How many ways can the letters of the word $\\text{MISSISSIPPI}$ be arranged so that no two $\\text{I}$'s are adjacent?",
+        options: ["$4200$", "$6300$", "$7350$", "$8400$", "$10500$"],
+        answer: 2,
+        solution: "The word $\\text{MISSISSIPPI}$ has $11$ letters: four $\\text{I}$'s, four $\\text{S}$'s, two $\\text{P}$'s, and one $\\text{M}$. First arrange the $7$ non-$\\text{I}$ letters ($\\text{M, S, S, S, S, P, P}$). The number of ways to do this is $$\\frac{7!}{4! \\, 2! \\, 1!} = \\frac{5040}{24 \\times 2} = 105.$$ These $7$ letters create $8$ gaps into which we must insert the $4$ identical $\\text{I}$'s so that no two are in the same gap. There are $\\binom{8}{4} = 70$ ways to choose the gaps. Multiplying gives $105 \\times 70 = 7350$."
+      },
+      {
+        id: 12,
+        topic: "Geometry",
+        difficulty: "Easy",
+        question: "A triangle has side lengths $13$, $14$, and $15$. What is the radius of its inscribed circle?",
+        options: ["$3$", "$3.5$", "$4$", "$4.5$", "$5$"],
+        answer: 2,
+        solution: "First, find the semiperimeter $s = \\frac{13 + 14 + 15}{2} = 21$. By Heron's Formula, the area $K$ of the triangle is $$K = \\sqrt{21(21 - 13)(21 - 14)(21 - 15)} = \\sqrt{21 \\times 8 \\times 7 \\times 6} = 84.$$ Using $K = rs$, where $r$ is the inradius, we obtain $$84 = r \\times 21 \\implies r = 4.$$"
+      },
+      {
+        id: 13,
+        topic: "Number Theory",
+        difficulty: "Easy",
+        question: "How many trailing zeros does $100!$ have when written in base $10$?",
+        options: ["$20$", "$22$", "$24$", "$25$", "$28$"],
+        answer: 2,
+        solution: "The number of trailing zeros in $100!$ equals the highest power of $5$ dividing $100!$ (since factors of $2$ are far more abundant). By Legendre's Formula, $$\\left\\lfloor \\frac{100}{5} \\right\\rfloor + \\left\\lfloor \\frac{100}{25} \\right\\rfloor + \\left\\lfloor \\frac{100}{125} \\right\\rfloor = 20 + 4 + 0 = 24.$$"
+      },
+      {
+        id: 14,
+        topic: "Algebra",
+        difficulty: "Challenging",
+        question: "Find the minimum value of $x + \\dfrac{9}{x - 2}$ for $x > 2$.",
+        options: ["$6$", "$7$", "$8$", "$9$", "$10$"],
+        answer: 2,
+        solution: "Rewrite the expression so that AM-GM applies cleanly to $(x - 2)$ and $\\frac{9}{x - 2}$: $$x + \\frac{9}{x - 2} = (x - 2) + \\frac{9}{x - 2} + 2.$$ Since $x > 2$, both $x - 2$ and $\\frac{9}{x - 2}$ are positive. By AM-GM, $$(x - 2) + \\frac{9}{x - 2} \\ge 2\\sqrt{(x - 2)\\cdot \\frac{9}{x - 2}} = 2\\sqrt{9} = 6,$$ with equality when $x - 2 = 3 \\implies x = 5$. Adding the constant $2$ gives a minimum value of $6 + 2 = 8$."
+      },
+      {
+        id: 15,
+        topic: "Probability",
+        difficulty: "Medium",
+        question: "A standard deck of $52$ playing cards has $4$ aces. Two cards are drawn at random without replacement. What is the probability that at least one of the cards is an ace?",
+        options: ["$\\frac{33}{221}$", "$\\frac{34}{221}$", "$\\frac{2}{13}$", "$\\frac{4}{13}$", "$\\frac{188}{221}$"],
+        answer: 0,
+        solution: "Using complementary counting, there are $52 - 4 = 48$ non-ace cards. The probability that neither card drawn is an ace is $$\\frac{48}{52} \\times \\frac{47}{51} = \\frac{12}{13} \\times \\frac{47}{51} = \\frac{4}{13} \\times \\frac{47}{17} = \\frac{188}{221}.$$ Subtracting this from $1$ gives the probability that at least one card is an ace: $$1 - \\frac{188}{221} = \\frac{33}{221}.$$"
+      },
+      {
+        id: 16,
+        topic: "Geometry",
+        difficulty: "Easy",
+        question: "Each interior angle of a regular polygon measures $156^\\circ$. How many sides does this polygon have?",
+        options: ["$12$", "$14$", "$15$", "$16$", "$18$"],
+        answer: 2,
+        solution: "If each interior angle of a regular polygon is $156^\\circ$, then each exterior angle measures $180^\\circ - 156^\\circ = 24^\\circ$. Because the sum of the exterior angles of any convex polygon is $360^\\circ$, the number of sides $n$ is $$n = \\frac{360^\\circ}{24^\\circ} = 15.$$"
+      },
+      {
+        id: 17,
+        topic: "Number Theory",
+        difficulty: "Challenging",
+        question: "Find the last two digits of $7^{2026}$.",
+        options: ["$07$", "$21$", "$43$", "$49$", "$93$"],
+        answer: 3,
+        solution: "We compute $7^{2026} \\pmod{100}$. Note that $7^4 = 2401 \\equiv 1 \\pmod{100}$. Dividing $2026$ by $4$ gives $2026 = 4 \\times 506 + 2$. Therefore, $$7^{2026} = (7^4)^{506} \\cdot 7^2 \\equiv 1^{506} \\cdot 49 = 49 \\pmod{100}.$$ The last two digits are $49$."
+      },
+      {
+        id: 18,
+        topic: "Combinatorics",
+        difficulty: "Easy",
+        question: "How many non-negative integer solutions $(x, y, z)$ satisfy the equation $x + y + z = 10$?",
+        options: ["$45$", "$55$", "$66$", "$72$", "$120$"],
+        answer: 2,
+        solution: "By the Stars and Bars theorem, the number of non-negative integer solutions to $x_1 + x_2 + \\dots + x_k = n$ is $\\binom{n + k - 1}{k - 1}$. Here $n = 10$ and $k = 3$, so the number of solutions is $$\\binom{10 + 3 - 1}{3 - 1} = \\binom{12}{2} = \\frac{12 \\times 11}{2} = 66.$$"
+      },
+      {
+        id: 19,
+        topic: "Algebra",
+        difficulty: "Easy",
+        question: "A store increases the price of a jacket by $25\\%$, and then offers a $20\\%$ discount on the new price. Compared to the original price, the final price is:",
+        options: ["$5\\%$ lower", "$5\\%$ higher", "the same", "$4\\%$ lower", "$4\\%$ higher"],
+        answer: 2,
+        solution: "Let the original price of the jacket be $P$. After a $25\\%$ increase, the intermediate price becomes $1.25P$. Applying a $20\\%$ discount multiplies this intermediate price by $1 - 0.20 = 0.80$: $$\\text{Final Price} = 0.80 \\times (1.25P) = 1.00P = P.$$ Thus, the final price is the same as the original price."
+      },
+      {
+        id: 20,
+        topic: "Geometry",
+        difficulty: "Easy",
+        question: "Two chords $AB$ and $CD$ of a circle intersect inside the circle at point $P$. If $AP = 6$, $PB = 4$, and $CP = 3$, what is the length of $CD$?",
+        options: ["$8$", "$9$", "$10$", "$11$", "$12$"],
+        answer: 3,
+        solution: "By the Power of a Point Theorem (intersecting chords theorem), we have $AP \\cdot PB = CP \\cdot PD$. Substituting $AP = 6$, $PB = 4$, and $CP = 3$ gives $$6 \\times 4 = 3 \\times PD \\implies 24 = 3 \\cdot PD \\implies PD = 8.$$ The total length of chord $CD$ is $CP + PD = 3 + 8 = 11$."
+      },
+      {
+        id: 21,
+        topic: "Number Theory",
+        difficulty: "Medium",
+        question: "Find the number of positive integers $n$ such that $n^2 + 19n + 92$ is divisible by $n + 7$.",
+        options: ["$1$", "$2$", "$3$", "$4$", "$5$"],
+        answer: 0,
+        solution: "Perform polynomial division of $n^2 + 19n + 92$ by $n + 7$: $$n^2 + 19n + 92 = (n + 7)(n + 12) + 8.$$ Thus, $(n + 7) \\mid (n^2 + 19n + 92)$ if and only if $(n + 7) \\mid 8$. Since $n$ is a positive integer, $n + 7 \\ge 8$. The only positive divisor of $8$ that is at least $8$ is $8$ itself, giving $n + 7 = 8 \\implies n = 1$. Hence there is $1$ such positive integer."
+      },
+      {
+        id: 22,
+        topic: "Probability",
+        difficulty: "Easy",
+        question: "Two numbers $a$ and $b$ are chosen independently and uniformly at random from the interval $[0, 1]$. What is the probability that $a + b \\le \\frac{1}{2}$?",
+        options: ["$\\frac{1}{16}$", "$\\frac{1}{8}$", "$\\frac{1}{6}$", "$\\frac{1}{4}$", "$\\frac{1}{2}$"],
+        answer: 1,
+        solution: "Represent $(a, b)$ as a point in the unit square $[0, 1] \\times [0, 1]$ of area $1$. The inequality $a + b \\le \\frac{1}{2}$ with $a \\ge 0, b \\ge 0$ defines a right triangle with vertices at $(0, 0)$, $\\left(\\frac{1}{2}, 0\\right)$, and $\\left(0, \\frac{1}{2}\\right)$. The area of this triangle is $$\\frac{1}{2} \\times \\frac{1}{2} \\times \\frac{1}{2} = \\frac{1}{8}.$$ Thus, the probability is $\\frac{1}{8}$."
+      },
+      {
+        id: 23,
+        topic: "Algebra",
+        difficulty: "Easy",
+        question: "If $x + \\dfrac{1}{x} = 4$, what is the value of $x^3 + \\dfrac{1}{x^3}$?",
+        options: ["$48$", "$52$", "$56$", "$60$", "$64$"],
+        answer: 1,
+        solution: "Cubing both sides of $x + \\frac{1}{x} = 4$ and using $(a + b)^3 = a^3 + b^3 + 3ab(a + b)$ gives $$\\left(x + \\frac{1}{x}\\right)^3 = x^3 + \\frac{1}{x^3} + 3\\left(x \\cdot \\frac{1}{x}\\right)\\left(x + \\frac{1}{x}\\right).$$ Substituting $x + \\frac{1}{x} = 4$ yields $$64 = x^3 + \\frac{1}{x^3} + 3(1)(4) \\implies x^3 + \\frac{1}{x^3} = 64 - 12 = 52.$$"
+      },
+      {
+        id: 24,
+        topic: "Combinatorics",
+        difficulty: "Medium",
+        question: "How many $4$-digit positive integers have strictly increasing digits from left to right (for example, $1358$)?",
+        options: ["$84$", "$120$", "$126$", "$210$", "$252$"],
+        answer: 2,
+        solution: "Because the digits are strictly increasing from left to right, the leading digit cannot be $0$. Any selection of $4$ distinct digits from the $9$ nonzero digits $\\{1, 2, 3, 4, 5, 6, 7, 8, 9\\}$ can be arranged in strictly increasing order in exactly one way. Therefore, the count is $$\\binom{9}{4} = \\frac{9 \\times 8 \\times 7 \\times 6}{4 \\times 3 \\times 2 \\times 1} = 126.$$"
+      },
+      {
+        id: 25,
+        topic: "Geometry",
+        difficulty: "Medium",
+        question: "A square is inscribed in a right triangle with legs of length $6$ and $8$ such that two sides of the square lie along the legs of the triangle and one vertex lies on the hypotenuse. What is the side length of the square?",
+        options: ["$\\frac{20}{7}$", "$3$", "$\\frac{24}{7}$", "$\\frac{25}{7}$", "$4$"],
+        answer: 2,
+        solution: "Place the right triangle in the coordinate plane with the right angle at $(0, 0)$, legs along the axes to $(8, 0)$ and $(0, 6)$. The equation of the hypotenuse is $\\frac{x}{8} + \\frac{y}{6} = 1$. If the inscribed square has side length $s$, its opposite vertex on the hypotenuse has coordinates $(s, s)$. Substituting $(s, s)$ gives $$\\frac{s}{8} + \\frac{s}{6} = 1 \\implies \\frac{7s}{24} = 1 \\implies s = \\frac{24}{7}.$$"
+      },
+      {
+        id: 26,
+        topic: "Number Theory",
+        difficulty: "Easy",
+        question: "What is the smallest positive integer $n$ such that $72n$ is a perfect cube?",
+        options: ["$2$", "$3$", "$4$", "$6$", "$9$"],
+        answer: 1,
+        solution: "Factor $72$ into primes: $72 = 8 \\times 9 = 2^3 \\cdot 3^2$. For $72n = 2^3 \\cdot 3^2 \\cdot n$ to be a perfect cube, every prime exponent in its factorization must be a multiple of $3$. The exponent of $2$ is already $3$, while the exponent of $3$ is $2$. To raise the exponent of $3$ to $3$, we need one additional factor of $3$. Thus, $n = 3$."
+      },
+      {
+        id: 27,
+        topic: "Algebra",
+        difficulty: "Medium",
+        question: "Find the value of $\\log_2 3 \\cdot \\log_3 4 \\cdot \\log_4 5 \\cdots \\log_{63} 64$.",
+        options: ["$4$", "$5$", "$6$", "$7$", "$8$"],
+        answer: 2,
+        solution: "Apply the change-of-base formula $\\log_a b = \\frac{\\ln b}{\\ln a}$ to each factor: $$\\frac{\\ln 3}{\\ln 2} \\cdot \\frac{\\ln 4}{\\ln 3} \\cdot \\frac{\\ln 5}{\\ln 4} \\cdots \\frac{\\ln 64}{\\ln 63}.$$ The intermediate terms telescope and cancel, leaving $$\\frac{\\ln 64}{\\ln 2} = \\log_2 64 = \\log_2 (2^6) = 6.$$"
+      },
+      {
+        id: 28,
+        topic: "Probability",
+        difficulty: "Challenging",
+        question: "A point $P$ is chosen uniformly at random inside a regular hexagon of side length $2$. What is the probability that $P$ is closer to the center of the hexagon than to any of its six vertices?",
+        options: ["$\\frac{1}{4}$", "$\\frac{1}{3}$", "$\\frac{1}{2}$", "$\\frac{2}{3}$", "$\\frac{3}{4}$"],
+        answer: 1,
+        solution: "Let $O$ be the center and $V_1, \\dots, V_6$ be the vertices of the regular hexagon of side length $2$. For each vertex $V_i$, the set of points closer to $O$ than to $V_i$ is bounded by the perpendicular bisector of segment $OV_i$. Since $OV_i = 2$, the perpendicular bisector lies at distance $1$ from $O$. The inner region bounded by all six perpendicular bisectors is a smaller regular hexagon centered at $O$ with apothem $1$, whereas the original regular hexagon has apothem $\\sqrt{3}$. Since areas of similar polygons scale as the square of their apothems, the ratio of areas is $$\\left(\\frac{1}{\\sqrt{3}}\\right)^2 = \\frac{1}{3}.$$"
+      },
+      {
+        id: 29,
+        topic: "Geometry",
+        difficulty: "Medium",
+        question: "A cube of side length $4$ is painted red on all six faces and then cut into $64$ unit cubes of side length $1$. How many of these unit cubes have exactly two red faces?",
+        options: ["$12$", "$16$", "$24$", "$32$", "$36$"],
+        answer: 2,
+        solution: "Unit cubes with exactly two painted faces lie strictly along the edges of the large cube, excluding the corner cubes (which have three painted faces). A cube has $12$ edges. Along each edge of length $4$, there are $4 - 2 = 2$ interior edge cubes. Therefore, the total number of unit cubes with exactly two red faces is $12 \\times 2 = 24$."
+      },
+      {
+        id: 30,
+        topic: "Combinatorics",
+        difficulty: "Medium",
+        question: "How many permutations of $\\{1, 2, 3, 4\\}$ have no element in its original position (i.e., derangements $D_4$)?",
+        options: ["$6$", "$8$", "$9$", "$10$", "$12$"],
+        answer: 2,
+        solution: "Using the derangement formula $D_n = n! \\sum_{k=0}^{n} \\frac{(-1)^k}{k!}$ for $n = 4$: $$D_4 = 24\\left(1 - 1 + \\frac{1}{2} - \\frac{1}{6} + \\frac{1}{24}\\right) = 12 - 4 + 1 = 9.$$"
+      },
+      {
+        id: 31,
+        topic: "Algebra",
+        difficulty: "Easy",
+        question: "If $3x + 2y = 19$ and $2x + 3y = 16$, what is the value of $x - y$?",
+        options: ["$1$", "$2$", "$3$", "$4$", "$5$"],
+        answer: 2,
+        solution: "Subtract the second equation from the first equation directly: $$(3x + 2y) - (2x + 3y) = 19 - 16.$$ Simplifying the left-hand side yields $x - y = 3$."
+      },
+      {
+        id: 32,
+        topic: "Number Theory",
+        difficulty: "Easy",
+        question: "Find the least positive integer that leaves a remainder of $2$ when divided by $3$, a remainder of $3$ when divided by $5$, and a remainder of $2$ when divided by $7$.",
+        options: ["$23$", "$38$", "$53$", "$68$", "$83$"],
+        answer: 0,
+        solution: "We want $n \\equiv 2 \\pmod{3}$ and $n \\equiv 2 \\pmod{7}$, which implies $n \\equiv 2 \\pmod{21}$. The positive integers satisfying $n \\equiv 2 \\pmod{21}$ are $2, 23, 44, 65, \\dots$. Checking these modulo $5$: $2 \\equiv 2 \\pmod{5}$, whereas $23 = 4 \\times 5 + 3 \\equiv 3 \\pmod{5}$. Thus, the least such positive integer is $23$."
+      },
+      {
+        id: 33,
+        topic: "Geometry",
+        difficulty: "Medium",
+        question: "Two congruent circles of radius $4$ are positioned so that each circle passes through the center of the other. What is the area of the region common to both circles?",
+        options: ["$\\frac{16\\pi}{3} - 4\\sqrt{3}$", "$\\frac{32\\pi}{3} - 8\\sqrt{3}$", "$\\frac{16\\pi}{3} - 8\\sqrt{3}$", "$\\frac{32\\pi}{3} - 4\\sqrt{3}$", "$8\\pi - 8\\sqrt{3}$"],
+        answer: 1,
+        solution: "Let the centers be $O_1$ and $O_2$, and let the intersection points be $A$ and $B$. Since $O_1O_2 = O_1A = O_2A = 4$, $\\triangle AO_1O_2$ and $\\triangle BO_1O_2$ are equilateral triangles of side length $4$. Thus $\\angle AO_1B = 120^\\circ$. Each half of the intersection is a circular segment of central angle $120^\\circ$ in a circle of radius $4$: $$\\text{Area}(\\text{segment}) = \\frac{120^\\circ}{360^\\circ}\\pi(4^2) - \\frac{1}{2}(4)(4)\\sin 120^\\circ = \\frac{16\\pi}{3} - 4\\sqrt{3}.$$ Doubling this gives $\\frac{32\\pi}{3} - 8\\sqrt{3}$."
+      },
+      {
+        id: 34,
+        topic: "Probability",
+        difficulty: "Medium",
+        question: "Two players $A$ and $B$ take turns flipping a fair coin, with $A$ going first. The first player to flip heads wins. What is the probability that $A$ wins?",
+        options: ["$\\frac{1}{2}$", "$\\frac{3}{5}$", "$\\frac{2}{3}$", "$\\frac{3}{4}$", "$\\frac{4}{5}$"],
+        answer: 2,
+        solution: "Let $p$ be the probability that $A$ wins. On the first flip, $A$ wins immediately with probability $\\frac{1}{2}$. If $A$ flips tails (probability $\\frac{1}{2}$), then $B$ becomes the first player in an identical game and wins with probability $p$, meaning $A$ wins with probability $1 - p$. Thus, $$p = \\frac{1}{2} + \\frac{1}{2}(1 - p) = 1 - \\frac{1}{2}p \\implies \\frac{3}{2}p = 1 \\implies p = \\frac{2}{3}.$$"
+      },
+      {
+        id: 35,
+        topic: "Algebra",
+        difficulty: "Medium",
+        question: "Find the remainder when the polynomial $P(x) = x^{100} - 2x^{51} + 1$ is divided by $x^2 - 1$.",
+        options: ["$-2x + 2$", "$2x - 2$", "$-2x$", "$2x$", "$0$"],
+        answer: 0,
+        solution: "Since $x^2 - 1 = (x - 1)(x + 1)$ has degree $2$, the remainder is a linear polynomial $R(x) = ax + b$, so $P(x) = (x^2 - 1)Q(x) + ax + b$. Evaluating at $x = 1$ and $x = -1$: $P(1) = 1 - 2 + 1 = 0 \\implies a + b = 0$, and $P(-1) = (-1)^{100} - 2(-1)^{51} + 1 = 4 \\implies -a + b = 4$. Adding gives $2b = 4 \\implies b = 2$, and $a = -2$. Thus the remainder is $-2x + 2$."
+      },
+      {
+        id: 36,
+        topic: "Combinatorics",
+        difficulty: "Easy",
+        question: "In how many ways can $6$ people be seated around a circular table, if two seating arrangements are considered identical when one can be obtained from the other by rotation?",
+        options: ["$60$", "$120$", "$240$", "$360$", "$720$"],
+        answer: 1,
+        solution: "The number of circular permutations of $n$ distinct objects is $(n - 1)!$. For $n = 6$ people, this is $(6 - 1)! = 5! = 120$."
+      },
+      {
+        id: 37,
+        topic: "Number Theory",
+        difficulty: "Medium",
+        question: "What is the largest prime factor of $2^{12} - 1$?",
+        options: ["$7$", "$11$", "$13$", "$17$", "$31$"],
+        answer: 2,
+        solution: "Factor $2^{12} - 1$ repeatedly using difference of squares: $$2^{12} - 1 = (2^6 - 1)(2^6 + 1) = (64 - 1)(64 + 1) = 63 \\times 65.$$ Factoring $63$ and $65$ into primes gives $63 \\times 65 = (3^2 \\cdot 7)(5 \\cdot 13) = 3^2 \\cdot 5 \\cdot 7 \\cdot 13$. The largest prime factor is $13$."
+      },
+      {
+        id: 38,
+        topic: "Geometry",
+        difficulty: "Easy",
+        question: "In $\\triangle ABC$, $AB = 10$, $AC = 14$, and $BC = 16$. Point $D$ lies on side $BC$ such that $AD$ bisects $\\angle BAC$. What is the length of $BD$?",
+        options: ["$\\frac{16}{3}$", "$6$", "$\\frac{20}{3}$", "$7$", "$8$"],
+        answer: 2,
+        solution: "By the Angle Bisector Theorem, the angle bisector $AD$ divides the opposite side $BC$ in the ratio of the adjacent sides: $$\\frac{BD}{DC} = \\frac{AB}{AC} = \\frac{10}{14} = \\frac{5}{7}.$$ Since $BD + DC = BC = 16$, $BD$ accounts for $\\frac{5}{5 + 7} = \\frac{5}{12}$ of $BC$. Thus, $BD = \\frac{5}{12} \\times 16 = \\frac{20}{3}$."
+      },
+      {
+        id: 39,
+        topic: "Algebra",
+        difficulty: "Easy",
+        question: "For how many real values of $x$ is $\\sqrt{x + 5} = x - 1$?",
+        options: ["$0$", "$1$", "$2$", "$3$", "infinitely many"],
+        answer: 1,
+        solution: "For $\\sqrt{x + 5}$ to equal $x - 1$, we must have $x - 1 \\ge 0$, so $x \\ge 1$. Squaring both sides gives $x + 5 = x^2 - 2x + 1 \\implies x^2 - 3x - 4 = 0 \\implies (x - 4)(x + 1) = 0$. Since $x \\ge 1$, $x = -1$ is extraneous, leaving $x = 4$ as the unique solution ($1$ real value)."
+      },
+      {
+        id: 40,
+        topic: "Probability",
+        difficulty: "Challenging",
+        question: "Four people sit around a circular table. Each person flips a fair coin. What is the probability that no two adjacent people flip the same outcome?",
+        options: ["$\\frac{1}{16}$", "$\\frac{1}{8}$", "$\\frac{3}{16}$", "$\\frac{1}{4}$", "$\\frac{3}{8}$"],
+        answer: 1,
+        solution: "There are $2^4 = 16$ equally likely outcomes for the four coin flips. For no two adjacent people around a circle of $4$ to have the same outcome, the outcomes must strictly alternate around the table: either $(H, T, H, T)$ or $(T, H, T, H)$. Since there are only $2$ alternating sequences out of $16$, the probability is $\\frac{2}{16} = \\frac{1}{8}$."
+      },
+      {
+        id: 41,
+        topic: "Combinatorics",
+        difficulty: "Challenging",
+        question: "How many rectangles (including squares) of any size can be formed by the grid lines of a standard $8 \\times 8$ chessboard?",
+        options: ["$256$", "$512$", "$1024$", "$1296$", "$2048$"],
+        answer: 3,
+        solution: "An $8 \\times 8$ chessboard is formed by $9$ vertical grid lines and $9$ horizontal grid lines. Any rectangle on the board is uniquely determined by choosing $2$ distinct vertical lines and $2$ distinct horizontal lines. Thus, the number of rectangles is $$\\binom{9}{2} \\times \\binom{9}{2} = 36 \\times 36 = 1296.$$"
+      },
+      {
+        id: 42,
+        topic: "Number Theory",
+        difficulty: "Challenging",
+        question: "Find the number of positive integers $n \\le 100$ that can be expressed as the difference of two squares of integers ($n = a^2 - b^2$ with $a, b \\in \\mathbb{Z}$).",
+        options: ["$50$", "$65$", "$75$", "$80$", "$85$"],
+        answer: 2,
+        solution: "An integer $n$ can be written as $a^2 - b^2 = (a - b)(a + b)$ if and only if $n$ can be factored into two integers of the same parity. Every odd integer $n = 1 \\cdot n$ works ($50$ integers in $\\{1, \\dots, 100\\}$), and every multiple of $4$, $n = 2 \\cdot \\frac{n}{2}$, works ($25$ integers in $\\{1, \\dots, 100\\}$). In total, $50 + 25 = 75$ integers are differences of two squares."
+      },
+      {
+        id: 43,
+        topic: "Geometry",
+        difficulty: "Challenging",
+        question: "A circle is tangent to the $x$-axis, the $y$-axis, and the line $3x + 4y = 12$ in the first quadrant. What is the smallest possible radius of this circle?",
+        options: ["$1$", "$1.5$", "$2$", "$3$", "$6$"],
+        answer: 0,
+        solution: "A circle in the first quadrant tangent to both coordinate axes has center $(r, r)$ and radius $r > 0$. The distance from $(r, r)$ to the line $3x + 4y - 12 = 0$ must equal $r$: $$\\frac{|3r + 4r - 12|}{\\sqrt{3^2 + 4^2}} = r \\implies \\frac{|7r - 12|}{5} = r.$$ Solving $7r - 12 = \\pm 5r$ gives $r = 6$ or $r = 1$. The smallest possible radius is $r = 1$."
+      },
+      {
+        id: 44,
+        topic: "Algebra",
+        difficulty: "Medium",
+        question: "Find the sum of all values of $x$ that satisfy $(x^2 - 5x + 5)^{x^2 - 7x + 12} = 1$.",
+        options: ["$5$", "$7$", "$9$", "$10$", "$12$"],
+        answer: 3,
+        solution: "An expression $A^B = 1$ holds in three cases: (1) $B = 0$ and $A \\neq 0$: $x^2 - 7x + 12 = 0 \\implies x \\in \\{3, 4\\}$; (2) $A = 1$: $x^2 - 5x + 5 = 1 \\implies x^2 - 5x + 4 = 0 \\implies x \\in \\{1, 4\\}$; (3) $A = -1$ and $B$ is even: $x^2 - 5x + 5 = -1 \\implies x \\in \\{2, 3\\}$, and at $x = 2$, $B = 2$ (even). The distinct solutions are $\\{1, 2, 3, 4\\}$, summing to $10$."
+      },
+      {
+        id: 45,
+        topic: "Probability",
+        difficulty: "Medium",
+        question: "A bag contains $5$ white balls and $3$ black balls. Balls are drawn one by one without replacement until all $3$ black balls have been drawn. What is the probability that the last black ball is drawn on the $6$th draw?",
+        options: ["$\\frac{3}{28}$", "$\\frac{5}{28}$", "$\\frac{3}{14}$", "$\\frac{5}{14}$", "$\\frac{15}{56}$"],
+        answer: 1,
+        solution: "There are $\\binom{8}{3} = 56$ equally likely positions for the $3$ black balls among the $8$ draws. For the third black ball to occur on draw $6$, exactly $2$ black balls must appear in the first $5$ draws, and the $6$th draw must be black. There are $\\binom{5}{2} = 10$ ways to choose which $2$ of the first $5$ draws are black, so the probability is $\\frac{10}{56} = \\frac{5}{28}$."
+      },
+      {
+        id: 46,
+        topic: "Number Theory",
+        difficulty: "Medium",
+        question: "Let $N$ be the smallest positive integer such that $N$ has exactly $12$ positive divisors. What is the sum of the digits of $N$?",
+        options: ["$6$", "$8$", "$9$", "$12$", "$15$"],
+        answer: 0,
+        solution: "The number of divisors of $N = p_1^{e_1} \\cdots p_k^{e_k}$ is $(e_1 + 1) \\cdots (e_k + 1) = 12$. Checking candidate forms: $2^{11} = 2048$, $2^5 \\cdot 3 = 96$, $2^3 \\cdot 3^2 = 72$, and $2^2 \\cdot 3 \\cdot 5 = 60$. The smallest is $N = 60$, whose digit sum is $6 + 0 = 6$."
+      },
+      {
+        id: 47,
+        topic: "Algebra",
+        difficulty: "Easy",
+        question: "A train travels from Town A to Town B at an average speed of $40$ miles per hour and immediately returns along the same route at an average speed of $60$ miles per hour. What is the train's average speed, in miles per hour, for the entire round trip?",
+        options: ["$45$", "$48$", "$50$", "$52$", "$54$"],
+        answer: 1,
+        solution: "Let the one-way distance be $d$ miles. Total time is $\\frac{d}{40} + \\frac{d}{60} = \\frac{5d}{120} = \\frac{d}{24}$ hours, and total distance is $2d$. Thus, the average speed is $\\frac{2d}{d/24} = 48$ mph."
+      },
+      {
+        id: 48,
+        topic: "Geometry",
+        difficulty: "Medium",
+        question: "In $\\triangle ABC$, $AB = 15$, $AC = 20$, and $\\angle A = 90^\\circ$. A circle centered at $O$ on side $BC$ is tangent to both $AB$ and $AC$. What is the radius of this circle?",
+        options: ["$\\frac{48}{7}$", "$7$", "$\\frac{60}{7}$", "$9$", "$\\frac{64}{7}$"],
+        answer: 2,
+        solution: "Let $r$ be the radius of the circle. Splitting $\\triangle ABC$ along segment $AO$ gives $\\text{Area}(\\triangle ABC) = \\text{Area}(\\triangle ABO) + \\text{Area}(\\triangle ACO)$, so $$\\frac{1}{2}(15)(20) = \\frac{1}{2}(15)r + \\frac{1}{2}(20)r \\implies 300 = 35r \\implies r = \\frac{60}{7}.$$"
+      },
+      {
+        id: 49,
+        topic: "Combinatorics",
+        difficulty: "Easy",
+        question: "How many subsets of the set $\\{1, 2, 3, 4, 5, 6\\}$ contain at least one odd number?",
+        options: ["$48$", "$54$", "$56$", "$60$", "$63$"],
+        answer: 2,
+        solution: "A set with $6$ elements has $2^6 = 64$ total subsets. The subsets containing no odd numbers are subsets of $\\{2, 4, 6\\}$, of which there are $2^3 = 8$. Subtracting gives $64 - 8 = 56$ subsets."
+      },
+      {
+        id: 50,
+        topic: "Number Theory",
+        difficulty: "Challenging",
+        question: "What is the smallest positive integer $n$ such that $\\frac{n}{2}$ is a perfect square, $\\frac{n}{3}$ is a perfect cube, and $\\frac{n}{5}$ is a perfect fifth power?",
+        options: ["$2^{15} \\cdot 3^{10} \\cdot 5^6$", "$2^{15} \\cdot 3^{20} \\cdot 5^{24}$", "$2^{15} \\cdot 3^{10} \\cdot 5^{24}$", "$2^{10} \\cdot 3^{15} \\cdot 5^6$", "$2^{15} \\cdot 3^{20} \\cdot 5^6$"],
+        answer: 0,
+        solution: "Write $n = 2^a \\cdot 3^b \\cdot 5^c$. Then: $a$ is odd and divisible by $3$ and $5$ (smallest is $a = 15$); $b$ is even, divisible by $5$, and $b \\equiv 1 \\pmod{3}$ (smallest is $b = 10$); $c$ is even, divisible by $3$, and $c \\equiv 1 \\pmod{5}$ (smallest is $c = 6$). Thus $n = 2^{15} \\cdot 3^{10} \\cdot 5^6$."
+      },
+      {
+        id: 51,
+        topic: "Combinatorics",
+        difficulty: "Easy",
+        question: "A regular octagon has $8$ vertices. How many diagonals does the octagon have?",
+        options: ["$16$", "$20$", "$24$", "$28$", "$32$"],
+        answer: 1,
+        solution: "The number of line segments connecting any two of the $8$ vertices is $\\binom{8}{2} = 28$. Subtracting the $8$ sides of the octagon leaves $28 - 8 = 20$ diagonals."
+      },
+      {
+        id: 52,
+        topic: "Algebra",
+        difficulty: "Easy",
+        question: "Let $f(x) = 2x^2 - 8x + 11$. What is the minimum possible value of $f(x)$ over all real numbers $x$?",
+        options: ["$1$", "$2$", "$3$", "$5$", "$11$"],
+        answer: 2,
+        solution: "Completing the square gives $f(x) = 2(x^2 - 4x + 4) + 11 - 8 = 2(x - 2)^2 + 3$. Since $(x - 2)^2 \\ge 0$ for all real $x$, the minimum value is $3$."
+      },
+      {
+        id: 53,
+        topic: "Geometry",
+        difficulty: "Challenging",
+        question: "In $\\triangle ABC$, $AB = 13$, $BC = 14$, and $CA = 15$. A circle is tangent to side $BC$ at $D$ and tangent to the extensions of sides $AB$ and $AC$ (the $A$-excircle). What is the radius of this excircle?",
+        options: ["$6$", "$7$", "$8$", "$9$", "$12$"],
+        answer: 4,
+        solution: "For $\\triangle ABC$ with sides $13, 14, 15$, the semiperimeter is $s = 21$ and the area is $K = 84$. The radius $r_a$ of the excircle opposite vertex $A$ (tangent to $a = BC = 14$) is $$r_a = \\frac{K}{s - a} = \\frac{84}{21 - 14} = \\frac{84}{7} = 12.$$"
+      },
+      {
+        id: 54,
+        topic: "Probability",
+        difficulty: "Challenging",
+        question: "Two cards are drawn at random without replacement from a set of cards numbered $1$ through $10$. What is the probability that the product of the two numbers drawn is even?",
+        options: ["$\\frac{2}{9}$", "$\\frac{5}{9}$", "$\\frac{2}{3}$", "$\\frac{7}{9}$", "$\\frac{8}{9}$"],
+        answer: 3,
+        solution: "The product is odd if and only if both numbers drawn are odd. Among $\\{1, \\dots, 10\\}$, there are $5$ odd numbers. The probability both are odd is $\\frac{5}{10} \\times \\frac{4}{9} = \\frac{2}{9}$. Thus the probability the product is even is $1 - \\frac{2}{9} = \\frac{7}{9}$."
+      },
+      {
+        id: 55,
+        topic: "Number Theory",
+        difficulty: "Easy",
+        question: "What is the remainder when $2^{50}$ is divided by $7$?",
+        options: ["$1$", "$2$", "$3$", "$4$", "$6$"],
+        answer: 3,
+        solution: "Notice that $2^3 = 8 \\equiv 1 \\pmod{7}$. Write $50 = 3 \\times 16 + 2$. Then $$2^{50} = (2^3)^{16} \\cdot 2^2 \\equiv 1^{16} \\cdot 4 = 4 \\pmod{7}.$$"
+      },
+      {
+        id: 56,
+        topic: "Algebra",
+        difficulty: "Challenging",
+        question: "Solve for $x$: $\\sqrt{x + \\sqrt{x + \\sqrt{x + \\dots}}} = 5$.",
+        options: ["$15$", "$20$", "$25$", "$30$", "$35$"],
+        answer: 1,
+        solution: "Because the nested radical is infinite, the expression inside the outermost square root also equals $5$. Thus $\\sqrt{x + 5} = 5 \\implies x + 5 = 25 \\implies x = 20$."
+      },
+      {
+        id: 57,
+        topic: "Geometry",
+        difficulty: "Challenging",
+        question: "A right rectangular prism has surface area $94$ and the sum of the lengths of all $12$ of its edges is $48$. What is the length of its internal space diagonal?",
+        options: ["$\\sqrt{38}$", "$\\sqrt{42}$", "$\\sqrt{46}$", "$\\sqrt{50}$", "$\\sqrt{54}$"],
+        answer: 3,
+        solution: "Let the dimensions be $a, b, c$. Then $4(a + b + c) = 48 \\implies a + b + c = 12$, and $2(ab + bc + ca) = 94$. The space diagonal satisfies $d^2 = a^2 + b^2 + c^2 = (a + b + c)^2 - 2(ab + bc + ca) = 144 - 94 = 50$, so $d = \\sqrt{50}$."
+      },
+      {
+        id: 58,
+        topic: "Combinatorics",
+        difficulty: "Challenging",
+        question: "How many functions $f : \\{1, 2, 3, 4\\} \\to \\{1, 2, 3\\}$ are surjective (onto)?",
+        options: ["$24$", "$36$", "$48$", "$64$", "$81$"],
+        answer: 1,
+        solution: "By the Principle of Inclusion-Exclusion, the number of surjective functions from a $4$-element set onto a $3$-element set is $$3^4 - \\binom{3}{1} 2^4 + \\binom{3}{2} 1^4 = 81 - 3(16) + 3(1) = 36.$$"
+      },
+      {
+        id: 59,
+        topic: "Number Theory",
+        difficulty: "Challenging",
+        question: "Find the remainder when $2025^{2026}$ is divided by $11$.",
+        options: ["$1$", "$3$", "$4$", "$5$", "$9$"],
+        answer: 0,
+        solution: "Since $2025 = 11 \\times 184 + 1$, we have $2025 \\equiv 1 \\pmod{11}$. Raising both sides to the $2026$th power gives $2025^{2026} \\equiv 1^{2026} = 1 \\pmod{11}$."
+      },
+      {
+        id: 60,
+        topic: "Probability",
+        difficulty: "Challenging",
+        question: "A fair die is rolled $3$ times. What is the probability that the three numbers rolled form a strictly increasing sequence?",
+        options: ["$\\frac{5}{54}$", "$\\frac{1}{9}$", "$\\frac{5}{36}$", "$\\frac{1}{6}$", "$\\frac{20}{216}$"],
+        answer: 0,
+        solution: "There are $6^3 = 216$ equally likely outcomes. Any subset of $3$ distinct numbers from $\\{1, 2, 3, 4, 5, 6\\}$ can be arranged in strictly increasing order in exactly one way. There are $\\binom{6}{3} = 20$ such subsets, giving probability $\\frac{20}{216} = \\frac{5}{54}$."
+      },
+      {
+        id: 61,
+        topic: "Algebra",
+        difficulty: "Challenging",
+        question: "If $x, y, z$ are positive real numbers such that $xy = 6$, $yz = 12$, and $zx = 8$, what is the value of $x + y + z$?",
+        options: ["$7$", "$8$", "$9$", "$10$", "$11$"],
+        answer: 2,
+        solution: "Multiplying all three equations gives $(xyz)^2 = 6 \\times 12 \\times 8 = 576 \\implies xyz = 24$. Dividing $xyz = 24$ by each equation gives $z = 4$, $x = 2$, and $y = 3$, so $x + y + z = 9$."
+      },
+      {
+        id: 62,
+        topic: "Geometry",
+        difficulty: "Easy",
+        question: "Two circles have radii $8$ and $3$, and the distance between their centers is $13$. What is the length of their common external tangent segment?",
+        options: ["$10$", "$11$", "$12$", "$12.5$", "$13$"],
+        answer: 2,
+        solution: "Form a right triangle with hypotenuse equal to the distance between centers ($13$) and one leg equal to the difference of the radii ($8 - 3 = 5$). By the Pythagorean Theorem, the length of the common external tangent is $\\sqrt{13^2 - 5^2} = 12$."
+      },
+      {
+        id: 63,
+        topic: "Combinatorics",
+        difficulty: "Challenging",
+        question: "In how many ways can the vertices of a regular pentagon be colored using $3$ available colors so that no two adjacent vertices receive the same color? (Rotations and reflections of the pentagon are considered distinct.)",
+        options: ["$24$", "$30$", "$36$", "$42$", "$48$"],
+        answer: 1,
+        solution: "The chromatic polynomial of an $n$-cycle graph $C_n$ is $P_{C_n}(\\lambda) = (\\lambda - 1)^n + (-1)^n (\\lambda - 1)$. Substituting $n = 5$ and $\\lambda = 3$ gives $P_{C_5}(3) = 2^5 - 2 = 30$."
+      },
+      {
+        id: 64,
+        topic: "Number Theory",
+        difficulty: "Easy",
+        question: "How many positive two-digit integers have an odd number of positive divisors?",
+        options: ["$5$", "$6$", "$7$", "$8$", "$9$"],
+        answer: 1,
+        solution: "A positive integer has an odd number of positive divisors if and only if it is a perfect square. The two-digit perfect squares are $16, 25, 36, 49, 64, 81$, giving $6$ integers."
+      },
+      {
+        id: 65,
+        topic: "Algebra",
+        difficulty: "Challenging",
+        question: "Find the number of real roots of the equation $2^x = x^2$.",
+        options: ["$0$", "$1$", "$2$", "$3$", "$4$"],
+        answer: 3,
+        solution: "For $x > 0$, $x = 2$ and $x = 4$ are the only two solutions (since $x \\ln 2 - 2 \\ln x$ is strictly concave). For $x < 0$, $2^x$ increases from $0$ to $1$ while $x^2$ decreases from $+\\infty$ to $0$, intersecting once near $x \\approx -0.77$. Thus there are $3$ real roots."
+      },
+      {
+        id: 66,
+        topic: "Geometry",
+        difficulty: "Challenging",
+        question: "In $\\triangle ABC$, $AB = 7$, $BC = 8$, and $CA = 9$. Point $D$ is on $BC$ such that $AD$ is an altitude. What is the length of $BD$?",
+        options: ["$2$", "$\\frac{5}{2}$", "$3$", "$\\frac{7}{2}$", "$4$"],
+        answer: 0,
+        solution: "Let $BD = x$, so $DC = 8 - x$. Equating $AD^2$ in $\\triangle ABD$ and $\\triangle ACD$ gives $7^2 - x^2 = 9^2 - (8 - x)^2 \\implies 49 - x^2 = 17 + 16x - x^2 \\implies 16x = 32 \\implies x = 2$."
+      },
+      {
+        id: 67,
+        topic: "Probability",
+        difficulty: "Easy",
+        question: "A bag contains $4$ red marbles and $6$ blue marbles. Two marbles are drawn at random without replacement. What is the probability that both marbles are red?",
+        options: ["$\\frac{2}{15}$", "$\\frac{4}{25}$", "$\\frac{1}{5}$", "$\\frac{4}{15}$", "$\\frac{2}{5}$"],
+        answer: 0,
+        solution: "The probability the first marble is red is $\\frac{4}{10}$, and given that, the probability the second is red is $\\frac{3}{9}$. Multiplying gives $\\frac{4}{10} \\times \\frac{3}{9} = \\frac{12}{90} = \\frac{2}{15}$."
+      },
+      {
+        id: 68,
+        topic: "Number Theory",
+        difficulty: "Easy",
+        question: "What is the units digit of $7^{2026}$?",
+        options: ["$1$", "$3$", "$5$", "$7$", "$9$"],
+        answer: 4,
+        solution: "The units digits of powers of $7$ cycle with length $4$: $(7, 9, 3, 1)$. Since $2026 = 4 \\times 506 + 2$, $7^{2026}$ has the same units digit as $7^2$, which is $9$."
+      },
+      {
+        id: 69,
+        topic: "Combinatorics",
+        difficulty: "Medium",
+        question: "In how many ways can $8$ indistinguishable candies be distributed among $4$ children so that each child gets at least $1$ candy?",
+        options: ["$20$", "$35$", "$56$", "$70$", "$84$"],
+        answer: 1,
+        solution: "First give $1$ candy to each of the $4$ children, leaving $4$ identical candies to distribute freely among $4$ children. By Stars and Bars, there are $\\binom{4 + 4 - 1}{4 - 1} = \\binom{7}{3} = 35$ ways."
+      },
+      {
+        id: 70,
+        topic: "Algebra",
+        difficulty: "Easy",
+        question: "The roots of the quadratic equation $x^2 - 7x + k = 0$ differ by $3$. What is the value of $k$?",
+        options: ["$6$", "$8$", "$10$", "$12$", "$14$"],
+        answer: 2,
+        solution: "By Vieta's formulas, $r + s = 7$. Combined with $r - s = 3$, we get $r = 5$ and $s = 2$. Thus $k = rs = 5 \\times 2 = 10$."
+      },
+      {
+        id: 71,
+        topic: "Geometry",
+        difficulty: "Medium",
+        question: "A regular tetrahedron has edge length $6$. What is its volume?",
+        options: ["$9\\sqrt{2}$", "$12\\sqrt{2}$", "$18\\sqrt{2}$", "$24\\sqrt{2}$", "$36\\sqrt{2}$"],
+        answer: 2,
+        solution: "The volume of a regular tetrahedron of edge length $a$ is $V = \\frac{a^3\\sqrt{2}}{12}$. Substituting $a = 6$ gives $V = \\frac{216\\sqrt{2}}{12} = 18\\sqrt{2}$."
+      },
+      {
+        id: 72,
+        topic: "Number Theory",
+        difficulty: "Medium",
+        question: "Find the smallest positive integer $n$ such that $n!$ is divisible by $2025$.",
+        options: ["$10$", "$12$", "$15$", "$18$", "$20$"],
+        answer: 0,
+        solution: "Factor $2025 = 45^2 = 3^4 \\cdot 5^2$. For $n!$ to be divisible by $5^2$, we need $n \\ge 10$. Checking $10!$, the exponent of $3$ is $\\lfloor 10/3 \\rfloor + \\lfloor 10/9 \\rfloor = 3 + 1 = 4$. Thus $n = 10$."
+      },
+      {
+        id: 73,
+        topic: "Probability",
+        difficulty: "Easy",
+        question: "Three distinct integers are chosen at random from the set $\\{1, 2, 3, 4, 5, 6, 7\\}$. What is the probability that their sum is odd?",
+        options: ["$\\frac{12}{35}$", "$\\frac{16}{35}$", "$\\frac{18}{35}$", "$\\frac{19}{35}$", "$\\frac{4}{7}$"],
+        answer: 1,
+        solution: "There are $4$ odd and $3$ even numbers. To get an odd sum, pick $3$ odds ($\\binom{4}{3} = 4$ ways) or $1$ odd and $2$ evens ($\\binom{4}{1}\\binom{3}{2} = 12$ ways). Out of $\\binom{7}{3} = 35$ triples, the probability is $\\frac{4 + 12}{35} = \\frac{16}{35}$."
+      },
+      {
+        id: 74,
+        topic: "Algebra",
+        difficulty: "Medium",
+        question: "What is the sum of the infinite series $\\sum_{n=1}^{\\infty} \\frac{1}{n(n+1)}$?",
+        options: ["$\\frac{1}{2}$", "$1$", "$\\frac{3}{2}$", "$2$", "$\\frac{5}{2}$"],
+        answer: 1,
+        solution: "Using partial fractions, $\\frac{1}{n(n+1)} = \\frac{1}{n} - \\frac{1}{n+1}$. The $N$-th partial sum telescopes to $1 - \\frac{1}{N+1}$, which approaches $1$ as $N \\to \\infty$."
+      },
+      {
+        id: 75,
+        topic: "Combinatorics",
+        difficulty: "Medium",
+        question: "How many triangles can be formed whose vertices are chosen from $10$ points on two parallel lines, where $6$ points lie on line $\\ell_1$ and $4$ points lie on line $\\ell_2$?",
+        options: ["$80$", "$84$", "$90$", "$96$", "$100$"],
+        answer: 3,
+        solution: "Choose $2$ points on $\\ell_1$ and $1$ on $\\ell_2$, or $1$ on $\\ell_1$ and $2$ on $\\ell_2$: $$\\binom{6}{2}\\binom{4}{1} + \\binom{6}{1}\\binom{4}{2} = 15(4) + 6(6) = 60 + 36 = 96.$$"
+      },
+      {
+        id: 76,
+        topic: "Geometry",
+        difficulty: "Medium",
+        question: "In circle $\\omega$, chords $AB$ and $CD$ are extended past $B$ and $D$ to meet at an external point $P$. If $PB = 4$, $AB = 8$, and $PD = 6$, what is the length of $CD$?",
+        options: ["$2$", "$3$", "$4$", "$5$", "$6$"],
+        answer: 0,
+        solution: "By Power of a Point, $PB \\cdot PA = PD \\cdot PC$. Here $PA = 4 + 8 = 12$, so $4 \\times 12 = 6 \\cdot PC \\implies PC = 8$. Thus $CD = PC - PD = 8 - 6 = 2$."
+      },
+      {
+        id: 77,
+        topic: "Number Theory",
+        difficulty: "Medium",
+        question: "What is the sum of the digits of $10^{20} - 20$?",
+        options: ["$168$", "$170$", "$172$", "$178$", "$180$"],
+        answer: 1,
+        solution: "$10^{20} - 20$ consists of eighteen $9$'s followed by $80$. The sum of its digits is $18 \\times 9 + 8 + 0 = 162 + 8 = 170$."
+      },
+      {
+        id: 78,
+        topic: "Algebra",
+        difficulty: "Medium",
+        question: "If $x^2 + x - 1 = 0$, what is the value of $x^4 + 3x$?",
+        options: ["$1$", "$2$", "$3$", "$4$", "$5$"],
+        answer: 1,
+        solution: "Since $x^2 = 1 - x$, we have $x^4 = (1 - x)^2 = 1 - 2x + x^2 = 1 - 2x + (1 - x) = 2 - 3x$. Adding $3x$ gives $x^4 + 3x = 2$."
+      },
+      {
+        id: 79,
+        topic: "Probability",
+        difficulty: "Medium",
+        question: "Two points are chosen independently and uniformly at random on a line segment of length $10$. What is the probability that the distance between the two points is at least $4$?",
+        options: ["$\\frac{4}{25}$", "$\\frac{6}{25}$", "$\\frac{9}{25}$", "$\\frac{16}{25}$", "$\\frac{3}{5}$"],
+        answer: 2,
+        solution: "In the $10 \\times 10$ square $[0, 10]^2$, the region $|x - y| \\ge 4$ consists of two right triangles each with legs of length $6$ and area $\\frac{1}{2}(6)(6) = 18$. Thus the probability is $\\frac{18 + 18}{100} = \\frac{36}{100} = \\frac{9}{25}$."
+      },
+      {
+        id: 80,
+        topic: "Geometry",
+        difficulty: "Easy",
+        question: "A sector of a circle with radius $12$ has a central angle of $120^\\circ$. If this sector is rolled into a right circular cone by joining its two straight radii, what is the radius of the base of the cone?",
+        options: ["$3$", "$4$", "$6$", "$8$", "$9$"],
+        answer: 1,
+        solution: "The arc length of the sector is $\\frac{120^\\circ}{360^\\circ} \\cdot 2\\pi(12) = 8\\pi$. Setting this equal to the base circumference $2\\pi r$ gives $r = 4$."
+      },
+      {
+        id: 81,
+        topic: "Combinatorics",
+        difficulty: "Easy",
+        question: "How many positive integers between $1$ and $500$ inclusive contain the digit $7$ at least once?",
+        options: ["$90$", "$95$", "$96$", "$100$", "$105$"],
+        answer: 1,
+        solution: "In $\\{000, 001, \\dots, 499\\}$, there are $5 \\times 9 \\times 9 = 405$ numbers with no digit $7$ (and $500$ also has no $7$). Subtracting from $500$ gives $500 - 405 = 95$ integers containing at least one $7$."
+      },
+      {
+        id: 82,
+        topic: "Number Theory",
+        difficulty: "Medium",
+        question: "How many positive integers $n$ satisfy $\\gcd(n, 30) = 1$ and $1 \\le n \\le 300$?",
+        options: ["$60$", "$72$", "$80$", "$90$", "$96$"],
+        answer: 2,
+        solution: "Using Euler's totient function, $\\varphi(30) = 30\\left(1 - \\frac{1}{2}\\right)\\left(1 - \\frac{1}{3}\\right)\\left(1 - \\frac{1}{5}\\right) = 8$. Across $300 = 10 \\times 30$ integers, there are $10 \\times 8 = 80$ such integers."
+      },
+      {
+        id: 83,
+        topic: "Algebra",
+        difficulty: "Medium",
+        question: "If $x > 0$ and $y > 0$ satisfy $x + 4y = 12$, what is the maximum possible value of $xy$?",
+        options: ["$6$", "$8$", "$9$", "$12$", "$16$"],
+        answer: 2,
+        solution: "By AM-GM on $x$ and $4y$, $\\frac{x + 4y}{2} \\ge \\sqrt{4xy} = 2\\sqrt{xy}$. Thus $6 \\ge 2\\sqrt{xy} \\implies xy \\le 9$, achieved when $x = 6, y = 1.5$."
+      },
+      {
+        id: 84,
+        topic: "Geometry",
+        difficulty: "Medium",
+        question: "What is the area of a regular dodecagon ($12$-gon) inscribed in a circle of radius $2$?",
+        options: ["$6$", "$8$", "$10$", "$12$", "$12\\sqrt{3}$"],
+        answer: 3,
+        solution: "Partitioning the dodecagon from the center creates $12$ congruent isosceles triangles with side $R = 2$ and central angle $30^\\circ$. Each triangle has area $\\frac{1}{2}(2^2)\\sin 30^\\circ = 1$, so the total area is $12 \\times 1 = 12$."
+      },
+      {
+        id: 85,
+        topic: "Probability",
+        difficulty: "Medium",
+        question: "A box contains $3$ red balls, $4$ green balls, and $5$ blue balls. Three balls are drawn at random without replacement. What is the probability that all three balls are of different colors?",
+        options: ["$\\frac{3}{11}$", "$\\frac{4}{11}$", "$\\frac{5}{11}$", "$\\frac{6}{11}$", "$\\frac{7}{11}$"],
+        answer: 0,
+        solution: "Out of $\\binom{12}{3} = 220$ ways to draw $3$ balls, there are $3 \\times 4 \\times 5 = 60$ ways to draw one of each color. The probability is $\\frac{60}{220} = \\frac{3}{11}$."
+      },
+      {
+        id: 86,
+        topic: "Number Theory",
+        difficulty: "Easy",
+        question: "Let $a$ and $b$ be positive integers such that $\\gcd(a, b) = 12$ and $\\operatorname{lcm}(a, b) = 360$. If $a = 60$, what is $b$?",
+        options: ["$48$", "$60$", "$72$", "$84$", "$96$"],
+        answer: 2,
+        solution: "Using $ab = \\gcd(a, b) \\cdot \\operatorname{lcm}(a, b)$, we have $60b = 12 \\times 360 \\implies b = 72$."
+      },
+      {
+        id: 87,
+        topic: "Algebra",
+        difficulty: "Medium",
+        question: "What is the sum of all real numbers $x$ satisfying $4^x - 6 \\cdot 2^x + 8 = 0$?",
+        options: ["$1$", "$2$", "$3$", "$4$", "$6$"],
+        answer: 2,
+        solution: "Let $u = 2^x > 0$. Then $u^2 - 6u + 8 = 0 \\implies (u - 2)(u - 4) = 0$, giving $2^x = 2 \\implies x = 1$ and $2^x = 4 \\implies x = 2$. Their sum is $1 + 2 = 3$."
+      },
+      {
+        id: 88,
+        topic: "Combinatorics",
+        difficulty: "Easy",
+        question: "In a class of $30$ students, $18$ play soccer, $15$ play basketball, and $5$ play neither sport. How many students play both soccer and basketball?",
+        options: ["$5$", "$6$", "$7$", "$8$", "$10$"],
+        answer: 3,
+        solution: "Since $30 - 5 = 25$ students play at least one sport, Inclusion-Exclusion gives $25 = 18 + 15 - |S \\cap B| \\implies |S \\cap B| = 8$."
+      },
+      {
+        id: 89,
+        topic: "Geometry",
+        difficulty: "Medium",
+        question: "A circle is inscribed in a right triangle with legs of length $5$ and $12$. What is the area of the circle?",
+        options: ["$2\\pi$", "$4\\pi$", "$6\\pi$", "$9\\pi$", "$\\frac{25\\pi}{4}$"],
+        answer: 1,
+        solution: "The hypotenuse is $\\sqrt{5^2 + 12^2} = 13$. The inradius of a right triangle is $r = \\frac{a + b - c}{2} = \\frac{5 + 12 - 13}{2} = 2$, so the area of the inscribed circle is $\\pi(2^2) = 4\\pi$."
+      },
+      {
+        id: 90,
+        topic: "Number Theory",
+        difficulty: "Easy",
+        question: "If $p$ and $q$ are prime numbers such that $p + q = 43$, what is the value of $pq$?",
+        options: ["$42$", "$82$", "$114$", "$164$", "$210$"],
+        answer: 1,
+        solution: "Since $43$ is odd, one prime must be $2$ and the other $43 - 2 = 41$. Their product is $2 \\times 41 = 82$."
+      },
+      {
+        id: 91,
+        topic: "Probability",
+        difficulty: "Medium",
+        question: "An unfair coin lands on heads with probability $\\frac{2}{3}$ and tails with probability $\\frac{1}{3}$. If the coin is flipped $4$ times, what is the probability that it lands on heads exactly twice?",
+        options: ["$\\frac{4}{27}$", "$\\frac{8}{27}$", "$\\frac{1}{3}$", "$\\frac{4}{9}$", "$\\frac{16}{27}$"],
+        answer: 1,
+        solution: "By the Binomial Probability Formula, the probability of $2$ heads in $4$ flips is $\\binom{4}{2}\\left(\\frac{2}{3}\\right)^2\\left(\\frac{1}{3}\\right)^2 = 6 \\times \\frac{4}{9} \\times \\frac{1}{9} = \\frac{8}{27}$."
+      },
+      {
+        id: 92,
+        topic: "Algebra",
+        difficulty: "Medium",
+        question: "The sum of the first $n$ terms of a sequence is given by $S_n = 3n^2 + 2n$ for all positive integers $n$. What is the $10$th term of this sequence?",
+        options: ["$56$", "$59$", "$62$", "$65$", "$320$"],
+        answer: 1,
+        solution: "The $10$th term is $a_{10} = S_{10} - S_9 = (300 + 20) - (243 + 18) = 320 - 261 = 59$."
+      },
+      {
+        id: 93,
+        topic: "Geometry",
+        difficulty: "Medium",
+        question: "An equilateral triangle and a regular hexagon have the same perimeter. What is the ratio of the area of the equilateral triangle to the area of the regular hexagon?",
+        options: ["$1 : 2$", "$2 : 3$", "$3 : 4$", "$4 : 9$", "$1 : 3$"],
+        answer: 1,
+        solution: "Let the common perimeter be $6s$. The triangle has side $2s$ and area $\\frac{(2s)^2\\sqrt{3}}{4} = s^2\\sqrt{3}$. The hexagon has side $s$ and area $6 \\cdot \\frac{s^2\\sqrt{3}}{4} = \\frac{3}{2}s^2\\sqrt{3}$. The ratio is $1 : \\frac{3}{2} = 2 : 3$."
+      },
+      {
+        id: 94,
+        topic: "Combinatorics",
+        difficulty: "Medium",
+        question: "How many positive integers less than $1000$ are palindromes (read the same forwards and backwards)?",
+        options: ["$99$", "$108$", "$109$", "$110$", "$118$"],
+        answer: 1,
+        solution: "There are $9$ one-digit palindromes ($1$–$9$), $9$ two-digit palindromes ($11$–$99$), and $9 \\times 10 = 90$ three-digit palindromes of the form $\\overline{aba}$. In total, $9 + 9 + 90 = 108$."
+      },
+      {
+        id: 95,
+        topic: "Number Theory",
+        difficulty: "Medium",
+        question: "How many ordered pairs of positive integers $(a, b)$ satisfy $\\operatorname{lcm}(a, b) = 12$?",
+        options: ["$9$", "$12$", "$15$", "$18$", "$21$"],
+        answer: 2,
+        solution: "Since $12 = 2^2 \\cdot 3^1$, for the power of $2$ we need $\\max(x_1, x_2) = 2$ ($3^2 - 2^2 = 5$ pairs), and for the power of $3$ we need $\\max(y_1, y_2) = 1$ ($2^2 - 1^2 = 3$ pairs). In total, $5 \\times 3 = 15$ ordered pairs."
+      },
+      {
+        id: 96,
+        topic: "Algebra",
+        difficulty: "Medium",
+        question: "If $a + b + c = 6$ and $ab + bc + ca = 11$, what is the value of $a^2 + b^2 + c^2$?",
+        options: ["$12$", "$14$", "$16$", "$18$", "$20$"],
+        answer: 1,
+        solution: "Using $(a + b + c)^2 = a^2 + b^2 + c^2 + 2(ab + bc + ca)$, we get $36 = a^2 + b^2 + c^2 + 22 \\implies a^2 + b^2 + c^2 = 14$."
+      },
+      {
+        id: 97,
+        topic: "Geometry",
+        difficulty: "Medium",
+        question: "In $\\triangle ABC$, $AB = 13$, $BC = 14$, and $CA = 15$. Point $M$ is the midpoint of $BC$. What is the length of median $AM$?",
+        options: ["$\\sqrt{145}$", "$12$", "$\\sqrt{148}$", "$\\sqrt{151}$", "$13$"],
+        answer: 2,
+        solution: "By Apollonius's Theorem, $15^2 + 13^2 = 2(AM^2 + 7^2) \\implies 394 = 2AM^2 + 98 \\implies AM^2 = 148 \\implies AM = \\sqrt{148}$."
+      },
+      {
+        id: 98,
+        topic: "Probability",
+        difficulty: "Easy",
+        question: "A fair coin is flipped $5$ times. What is the probability of obtaining at least $4$ heads?",
+        options: ["$\\frac{1}{8}$", "$\\frac{5}{32}$", "$\\frac{3}{16}$", "$\\frac{7}{32}$", "$\\frac{1}{4}$"],
+        answer: 2,
+        solution: "Out of $2^5 = 32$ outcomes, there are $\\binom{5}{4} = 5$ ways to get $4$ heads and $\\binom{5}{5} = 1$ way to get $5$ heads, giving probability $\\frac{6}{32} = \\frac{3}{16}$."
+      },
+      {
+        id: 99,
+        topic: "Combinatorics",
+        difficulty: "Medium",
+        question: "How many ways can $5$ identical balls be placed into $3$ distinct boxes such that no box is empty?",
+        options: ["$3$", "$6$", "$10$", "$15$", "$21$"],
+        answer: 1,
+        solution: "Place $1$ ball in each of the $3$ distinct boxes first, leaving $2$ identical balls to distribute freely among $3$ boxes. By Stars and Bars, there are $\\binom{2 + 3 - 1}{3 - 1} = \\binom{4}{2} = 6$ ways."
+      },
+      {
+        id: 100,
+        topic: "Algebra",
+        difficulty: "Medium",
+        question: "What is the coefficient of $x^3$ in the expansion of $(2x - 1)^5$?",
+        options: ["$-80$", "$-40$", "$40$", "$80$", "$160$"],
+        answer: 3,
+        solution: "By the Binomial Theorem, the $x^3$ term in $(2x - 1)^5$ is $\\binom{5}{2}(2x)^3(-1)^2 = 10 \\cdot 8x^3 \\cdot 1 = 80x^3$, so the coefficient is $80$."
+      }
+    ];
+
+    // --- State Management & Persistence ---
+    const STORAGE_KEY = 'amc10_daily_practice_v1';
+
+    function getTodayStr() {
+      const d = new Date();
+      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    }
+
+    function getYesterdayStr() {
+      const d = new Date();
+      d.setDate(d.getDate() - 1);
+      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    }
+
+    const defaultState = {
+      currentIndex: 0,
+      selectedOption: null, // uncommitted selection on current question
+      records: {}, // { [id]: { selected: number|null, status: 'correct'|'incorrect'|'revealed', flagged: boolean, note: string } }
+      dailyLog: {}, // { 'YYYY-MM-DD': [id1, id2, ...] }
+      streak: 0,
+      lastStreakDate: null,
+      dailyPairIds: null, // [id1, id2] assigned for today
+      dailyPairDate: null,
+      filter: 'all',
+      scratchpadOpen: false
+    };
+
+    let state = loadState();
+
+    function loadState() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return { ...defaultState };
+        const parsed = JSON.parse(raw);
+        return { ...defaultState, ...parsed };
+      } catch (e) {
+        return { ...defaultState };
+      }
+    }
+
+    function saveState() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      } catch (e) {
+        console.warn('Unable to save progress to localStorage', e);
+      }
+    }
+
+    // Determine or refresh Today's Daily 2-Question Set
+    function ensureDailySet() {
+      const today = getTodayStr();
+      if (state.dailyPairDate !== today || !Array.isArray(state.dailyPairIds) || state.dailyPairIds.length === 0) {
+        // Pick the next 2 unanswered questions in sequence (or wrap around if nearly finished)
+        const unanswered = PROBLEMS.filter(p => !state.records[p.id] || !state.records[p.id].status);
+        let pair = [];
+        if (unanswered.length >= 2) {
+          pair = [unanswered[0].id, unanswered[1].id];
+        } else if (unanswered.length === 1) {
+          const fallback = PROBLEMS.find(p => p.id !== unanswered[0].id);
+          pair = [unanswered[0].id, fallback.id];
+        } else {
+          // All 100 completed: pick 2 based on day-of-year
+          const dayIdx = (new Date().getDate() * 2) % PROBLEMS.length;
+          pair = [PROBLEMS[dayIdx].id, PROBLEMS[(dayIdx + 1) % PROBLEMS.length].id];
+        }
+        state.dailyPairIds = pair;
+        state.dailyPairDate = today;
+
+        // Check if streak broke
+        const yesterday = getYesterdayStr();
+        if (state.lastStreakDate && state.lastStreakDate !== today && state.lastStreakDate !== yesterday) {
+          state.streak = 0;
+        }
+        saveState();
+      }
+    }
+
+    function recordDailyCompletion(problemId) {
+      const today = getTodayStr();
+      if (!state.dailyLog[today]) state.dailyLog[today] = [];
+      if (!state.dailyLog[today].includes(problemId)) {
+        state.dailyLog[today].push(problemId);
+      }
+      if (state.dailyLog[today].length >= 2 && state.lastStreakDate !== today) {
+        const yesterday = getYesterdayStr();
+        if (state.lastStreakDate === yesterday) {
+          state.streak += 1;
+        } else {
+          state.streak = 1;
+        }
+        state.lastStreakDate = today;
+      }
+    }
+
+    // --- DOM Elements ---
+    const problemNumberBadge = document.getElementById('problemNumberBadge');
+    const dailySetPill = document.getElementById('dailySetPill');
+    const hiddenHintMask = document.getElementById('hiddenHintMask');
+    const topicBadge = document.getElementById('topicBadge');
+    const difficultyBadge = document.getElementById('difficultyBadge');
+    const flagBtn = document.getElementById('flagBtn');
+    const flagIcon = document.getElementById('flagIcon');
+    const questionText = document.getElementById('questionText');
+    const optionsContainer = document.getElementById('optionsContainer');
+    const submitBtn = document.getElementById('submitBtn');
+    const showSolutionBtn = document.getElementById('showSolutionBtn');
+    const solutionSection = document.getElementById('solutionSection');
+    const resultBanner = document.getElementById('resultBanner');
+    const correctLetterPill = document.getElementById('correctLetterPill');
+    const solutionText = document.getElementById('solutionText');
+    const nextAfterSolveBtn = document.getElementById('nextAfterSolveBtn');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const randomBtn = document.getElementById('randomBtn');
+    const toggleGridBtn = document.getElementById('toggleGridBtn');
+    const gridDrawer = document.getElementById('gridDrawer');
+    const questionGrid = document.getElementById('questionGrid');
+    const dailyCountText = document.getElementById('dailyCountText');
+    const dailyDot = document.getElementById('dailyDot');
+    const streakCountText = document.getElementById('streakCountText');
+    const overallSolvedText = document.getElementById('overallSolvedText');
+    const overallAccText = document.getElementById('overallAccText');
+    const jumpDailyBtn = document.getElementById('jumpDailyBtn');
+    const toggleScratchpadBtn = document.getElementById('toggleScratchpadBtn');
+    const workspaceGrid = document.getElementById('workspaceGrid');
+    const scratchpadCard = document.getElementById('scratchpadCard');
+    const scratchpadInput = document.getElementById('scratchpadInput');
+    const clearNoteBtn = document.getElementById('clearNoteBtn');
+    const resetModal = document.getElementById('resetModal');
+    const openResetModalBtn = document.getElementById('openResetModalBtn');
+    const cancelResetBtn = document.getElementById('cancelResetBtn');
+    const confirmResetBtn = document.getElementById('confirmResetBtn');
+
+    const LETTERS = ['A', 'B', 'C', 'D', 'E'];
+
+    function renderMath(el) {
+      if (window.renderMathInElement) {
+        renderMathInElement(el, {
+          delimiters: [
+            { left: '$$', right: '$$', display: true },
+            { left: '$', right: '$', display: false }
+          ],
+          throwOnError: false
+        });
+      }
+    }
+
+    function updateStatsHeader() {
+      const today = getTodayStr();
+      const todayCompleted = (state.dailyLog[today] || []).length;
+      dailyCountText.textContent = `${Math.min(todayCompleted, 2)}/2`;
+      if (todayCompleted >= 2) {
+        dailyDot.classList.remove('bg-indigo-600');
+        dailyDot.classList.add('bg-emerald-500');
+      } else {
+        dailyDot.classList.add('bg-indigo-600');
+        dailyDot.classList.remove('bg-emerald-500');
+      }
+
+      streakCountText.textContent = state.streak;
+
+      const values = Object.values(state.records);
+      const answered = values.filter(r => r.status === 'correct' || r.status === 'incorrect');
+      const correct = values.filter(r => r.status === 'correct');
+      const totalResolved = values.filter(r => r.status).length;
+
+      overallSolvedText.textContent = `${totalResolved}/100`;
+      if (answered.length > 0) {
+        const pct = Math.round((correct.length / answered.length) * 100);
+        overallAccText.textContent = `${pct}%`;
+      } else {
+        overallAccText.textContent = '—';
+      }
+    }
+
+    function renderQuestionGrid() {
+      questionGrid.innerHTML = '';
+      PROBLEMS.forEach((p, idx) => {
+        const rec = state.records[p.id] || {};
+        const isCurrent = idx === state.currentIndex;
+
+        // Filter check
+        let matchesFilter = true;
+        if (state.filter === 'unanswered' && rec.status) matchesFilter = false;
+        if (state.filter === 'missed' && rec.status !== 'incorrect') matchesFilter = false;
+        if (state.filter === 'mastered' && rec.status !== 'correct') matchesFilter = false;
+        if (state.filter === 'flagged' && !rec.flagged) matchesFilter = false;
+
+        const btn = document.createElement('button');
+        btn.textContent = p.id;
+        btn.title = `Problem #${p.id}` + (rec.status ? ` (${rec.status})` : ' (Unanswered)');
+
+        let baseClasses = 'relative h-8 rounded-lg text-xs font-semibold flex items-center justify-center transition border ';
+        if (!matchesFilter) {
+          baseClasses += 'opacity-25 ';
+        }
+
+        if (rec.status === 'correct') {
+          baseClasses += 'bg-emerald-500 text-white border-emerald-600 hover:bg-emerald-600 ';
+        } else if (rec.status === 'incorrect') {
+          baseClasses += 'bg-rose-500 text-white border-rose-600 hover:bg-rose-600 ';
+        } else if (rec.status === 'revealed') {
+          baseClasses += 'bg-amber-200 text-amber-950 border-amber-300 hover:bg-amber-300 ';
+        } else {
+          baseClasses += 'bg-slate-100 text-slate-700 border-slate-200 hover:bg-slate-200 ';
+        }
+
+        if (isCurrent) {
+          baseClasses += 'ring-2 ring-offset-1 ring-navy-900 font-extrabold ';
+        }
+
+        btn.className = baseClasses;
+
+        if (rec.flagged) {
+          const dot = document.createElement('span');
+          dot.className = 'absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-amber-400 border border-white';
+          btn.appendChild(dot);
+        }
+
+        btn.addEventListener('click', () => {
+          goToProblem(idx);
+        });
+        questionGrid.appendChild(btn);
+      });
+    }
+
+    function renderCurrentProblem() {
+      const problem = PROBLEMS[state.currentIndex];
+      const rec = state.records[problem.id] || {};
+      const isSolved = Boolean(rec.status);
+
+      problemNumberBadge.textContent = `Problem #${problem.id}`;
+
+      // Daily Set Pill
+      if (state.dailyPairIds && state.dailyPairIds.includes(problem.id)) {
+        dailySetPill.classList.remove('hidden');
+      } else {
+        dailySetPill.classList.add('hidden');
+      }
+
+      // Flag state
+      if (rec.flagged) {
+        flagBtn.classList.add('bg-amber-50', 'border-amber-300', 'text-amber-500');
+        flagBtn.classList.remove('text-slate-400');
+        flagIcon.setAttribute('fill', 'currentColor');
+      } else {
+        flagBtn.classList.remove('bg-amber-50', 'border-amber-300', 'text-amber-500');
+        flagBtn.classList.add('text-slate-400');
+        flagIcon.setAttribute('fill', 'none');
+      }
+
+      // Spoiler Tags (Hidden until solved/revealed)
+      if (isSolved) {
+        hiddenHintMask.classList.add('hidden');
+        topicBadge.classList.remove('hidden');
+        difficultyBadge.classList.remove('hidden');
+        topicBadge.textContent = problem.topic;
+        difficultyBadge.textContent = problem.difficulty;
+
+        difficultyBadge.className = 'px-2.5 py-1 rounded-lg text-xs font-semibold border ';
+        if (problem.difficulty === 'Easy') {
+          difficultyBadge.className += 'bg-emerald-50 text-emerald-800 border-emerald-200';
+        } else if (problem.difficulty === 'Medium') {
+          difficultyBadge.className += 'bg-amber-50 text-amber-800 border-amber-200';
+        } else {
+          difficultyBadge.className += 'bg-purple-50 text-purple-800 border-purple-200';
+        }
+      } else {
+        hiddenHintMask.classList.remove('hidden');
+        topicBadge.classList.add('hidden');
+        difficultyBadge.classList.add('hidden');
+      }
+
+      // Question text
+      questionText.innerHTML = problem.question;
+
+      // Options
+      optionsContainer.innerHTML = '';
+      const activeChoice = isSolved ? rec.selected : state.selectedOption;
+
+      problem.options.forEach((optText, idx) => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+
+        let classes = 'w-full text-left p-4 rounded-xl border-2 flex items-center gap-4 transition focus:outline-none ';
+        let badgeClasses = 'w-8 h-8 rounded-lg flex items-center justify-center font-bold text-sm shrink-0 transition ';
+
+        if (isSolved) {
+          if (idx === problem.answer) {
+            classes += 'bg-emerald-50/90 border-emerald-500 text-emerald-950 ';
+            badgeClasses += 'bg-emerald-600 text-white ';
+          } else if (idx === rec.selected && rec.selected !== problem.answer) {
+            classes += 'bg-rose-50/90 border-rose-500 text-rose-950 ';
+            badgeClasses += 'bg-rose-600 text-white ';
+          } else {
+            classes += 'bg-white border-slate-200 text-slate-500 opacity-75 ';
+            badgeClasses += 'bg-slate-100 text-slate-500 ';
+          }
+        } else {
+          if (activeChoice === idx) {
+            classes += 'bg-indigo-50/70 border-indigo-600 text-slate-900 shadow-xs ';
+            badgeClasses += 'bg-indigo-600 text-white ';
+          } else {
+            classes += 'bg-white border-slate-200 hover:border-slate-300 hover:bg-slate-50 text-slate-800 ';
+            badgeClasses += 'bg-slate-100 text-slate-700 ';
+          }
+        }
+
+        btn.className = classes;
+        btn.innerHTML = `
+          <span class="${badgeClasses}">${LETTERS[idx]}</span>
+          <span class="text-base font-medium">${optText}</span>
+        `;
+
+        if (!isSolved) {
+          btn.addEventListener('click', () => {
+            state.selectedOption = idx;
+            renderCurrentProblem();
+          });
+        }
+
+        optionsContainer.appendChild(btn);
+      });
+
+      // Buttons & Solution Card visibility
+      if (isSolved) {
+        submitBtn.disabled = true;
+        submitBtn.classList.add('hidden');
+        showSolutionBtn.classList.add('hidden');
+        solutionSection.classList.remove('hidden');
+
+        correctLetterPill.textContent = `Correct Answer: (${LETTERS[problem.answer]})`;
+        solutionText.innerHTML = problem.solution;
+
+        if (rec.status === 'correct') {
+          resultBanner.className = 'mb-5 p-4 rounded-xl border bg-emerald-50 border-emerald-200 text-emerald-900 flex items-center justify-between gap-3';
+          resultBanner.innerHTML = `
+            <div class="flex items-center gap-2.5 font-semibold text-sm sm:text-base">
+              <svg class="w-5 h-5 text-emerald-600 shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+              <span>Correct! Great job solving Problem #${problem.id}.</span>
+            </div>
+            <button id="retryProblemBtn" class="text-xs font-semibold underline text-emerald-800 hover:text-emerald-950 shrink-0">Retry</button>
+          `;
+        } else if (rec.status === 'incorrect') {
+          resultBanner.className = 'mb-5 p-4 rounded-xl border bg-rose-50 border-rose-200 text-rose-900 flex items-center justify-between gap-3';
+          resultBanner.innerHTML = `
+            <div class="flex items-center gap-2.5 font-semibold text-sm sm:text-base">
+              <svg class="w-5 h-5 text-rose-600 shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+              <span>Incorrect — You selected (${LETTERS[rec.selected]}). Review the solution below.</span>
+            </div>
+            <button id="retryProblemBtn" class="text-xs font-semibold underline text-rose-800 hover:text-rose-950 shrink-0">Retry</button>
+          `;
+        } else {
+          resultBanner.className = 'mb-5 p-4 rounded-xl border bg-amber-50 border-amber-200 text-amber-900 flex items-center justify-between gap-3';
+          resultBanner.innerHTML = `
+            <div class="flex items-center gap-2.5 font-semibold text-sm sm:text-base">
+              <span>Solution revealed without submitting an answer.</span>
+            </div>
+            <button id="retryProblemBtn" class="text-xs font-semibold underline text-amber-800 hover:text-amber-950 shrink-0">Try Again</button>
+          `;
+        }
+
+        const retryBtn = document.getElementById('retryProblemBtn');
+        if (retryBtn) {
+          retryBtn.addEventListener('click', () => {
+            delete state.records[problem.id].status;
+            delete state.records[problem.id].selected;
+            state.selectedOption = null;
+            saveState();
+            updateStatsHeader();
+            renderQuestionGrid();
+            renderCurrentProblem();
+          });
+        }
+      } else {
+        submitBtn.classList.remove('hidden');
+        showSolutionBtn.classList.remove('hidden');
+        submitBtn.disabled = state.selectedOption === null;
+        solutionSection.classList.add('hidden');
+      }
+
+      // Navigation button states
+      prevBtn.disabled = state.currentIndex === 0;
+      nextBtn.disabled = state.currentIndex === PROBLEMS.length - 1;
+
+      // Scratchpad content for this problem
+      scratchpadInput.value = rec.note || '';
+
+      // Render LaTeX via KaTeX
+      renderMath(document.body);
+    }
+
+    function goToProblem(index) {
+      if (index < 0 || index >= PROBLEMS.length) return;
+      state.currentIndex = index;
+      state.selectedOption = null;
+      saveState();
+      renderQuestionGrid();
+      renderCurrentProblem();
+    }
+
+    function handleSubmit() {
+      const problem = PROBLEMS[state.currentIndex];
+      if (state.selectedOption === null) return;
+      const isCorrect = state.selectedOption === problem.answer;
+      const prevRec = state.records[problem.id] || {};
+      state.records[problem.id] = {
+        ...prevRec,
+        selected: state.selectedOption,
+        status: isCorrect ? 'correct' : 'incorrect'
+      };
+      recordDailyCompletion(problem.id);
+      saveState();
+      updateStatsHeader();
+      renderQuestionGrid();
+      renderCurrentProblem();
+    }
+
+    function handleShowSolution() {
+      const problem = PROBLEMS[state.currentIndex];
+      const prevRec = state.records[problem.id] || {};
+      state.records[problem.id] = {
+        ...prevRec,
+        selected: null,
+        status: 'revealed'
+      };
+      recordDailyCompletion(problem.id);
+      saveState();
+      updateStatsHeader();
+      renderQuestionGrid();
+      renderCurrentProblem();
+    }
+
+    // --- Event Listeners ---
+    submitBtn.addEventListener('click', handleSubmit);
+    showSolutionBtn.addEventListener('click', handleShowSolution);
+
+    prevBtn.addEventListener('click', () => goToProblem(state.currentIndex - 1));
+    nextBtn.addEventListener('click', () => goToProblem(state.currentIndex + 1));
+    nextAfterSolveBtn.addEventListener('click', () => {
+      if (state.currentIndex < PROBLEMS.length - 1) {
+        goToProblem(state.currentIndex + 1);
+      }
+    });
+
+    randomBtn.addEventListener('click', () => {
+      const unsolvedIndices = PROBLEMS
+        .map((p, i) => ({ p, i }))
+        .filter(({ p, i }) => i !== state.currentIndex && (!state.records[p.id] || !state.records[p.id].status))
+        .map(({ i }) => i);
+
+      if (unsolvedIndices.length > 0) {
+        const randIdx = unsolvedIndices[Math.floor(Math.random() * unsolvedIndices.length)];
+        goToProblem(randIdx);
+      } else {
+        const randIdx = Math.floor(Math.random() * PROBLEMS.length);
+        goToProblem(randIdx);
+      }
+    });
+
+    jumpDailyBtn.addEventListener('click', () => {
+      ensureDailySet();
+      if (state.dailyPairIds && state.dailyPairIds.length > 0) {
+        // Jump to first uncompleted in today's daily set, or first of the pair
+        const targetId = state.dailyPairIds.find(id => !state.records[id] || !state.records[id].status) || state.dailyPairIds[0];
+        const idx = PROBLEMS.findIndex(p => p.id === targetId);
+        if (idx !== -1) goToProblem(idx);
+      }
+    });
+
+    flagBtn.addEventListener('click', () => {
+      const problem = PROBLEMS[state.currentIndex];
+      const prevRec = state.records[problem.id] || {};
+      state.records[problem.id] = {
+        ...prevRec,
+        flagged: !prevRec.flagged
+      };
+      saveState();
+      renderQuestionGrid();
+      renderCurrentProblem();
+    });
+
+    toggleGridBtn.addEventListener('click', () => {
+      gridDrawer.classList.toggle('hidden');
+    });
+
+    // Filter tabs
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        state.filter = btn.dataset.filter;
+        document.querySelectorAll('.filter-btn').forEach(b => {
+          b.classList.remove('bg-white', 'text-slate-900', 'shadow-sm');
+          b.classList.add('text-slate-600');
+        });
+        btn.classList.add('bg-white', 'text-slate-900', 'shadow-sm');
+        btn.classList.remove('text-slate-600');
+        saveState();
+        renderQuestionGrid();
+      });
+    });
+
+    // Scratchpad toggle & persistence
+    function applyScratchpadLayout() {
+      if (state.scratchpadOpen) {
+        scratchpadCard.classList.remove('hidden');
+        workspaceGrid.classList.add('lg:grid-cols-3');
+        workspaceGrid.firstElementChild.classList.add('lg:col-span-2');
+        toggleScratchpadBtn.classList.add('bg-indigo-50', 'border-indigo-200', 'text-indigo-800');
+      } else {
+        scratchpadCard.classList.add('hidden');
+        workspaceGrid.classList.remove('lg:grid-cols-3');
+        workspaceGrid.firstElementChild.classList.remove('lg:col-span-2');
+        toggleScratchpadBtn.classList.remove('bg-indigo-50', 'border-indigo-200', 'text-indigo-800');
+      }
+    }
+
+    toggleScratchpadBtn.addEventListener('click', () => {
+      state.scratchpadOpen = !state.scratchpadOpen;
+      saveState();
+      applyScratchpadLayout();
+    });
+
+    scratchpadInput.addEventListener('input', () => {
+      const problem = PROBLEMS[state.currentIndex];
+      const prevRec = state.records[problem.id] || {};
+      state.records[problem.id] = {
+        ...prevRec,
+        note: scratchpadInput.value
+      };
+      saveState();
+    });
+
+    clearNoteBtn.addEventListener('click', () => {
+      scratchpadInput.value = '';
+      const problem = PROBLEMS[state.currentIndex];
+      if (state.records[problem.id]) {
+        state.records[problem.id].note = '';
+        saveState();
+      }
+    });
+
+    // Reset Progress Modal
+    openResetModalBtn.addEventListener('click', () => resetModal.classList.remove('hidden'));
+    cancelResetBtn.addEventListener('click', () => resetModal.classList.add('hidden'));
+    confirmResetBtn.addEventListener('click', () => {
+      localStorage.removeItem(STORAGE_KEY);
+      state = { ...defaultState };
+      ensureDailySet();
+      resetModal.classList.add('hidden');
+      applyScratchpadLayout();
+      updateStatsHeader();
+      renderQuestionGrid();
+      renderCurrentProblem();
+    });
+
+    // Keyboard shortcuts (ignored when typing in scratchpad)
+    document.addEventListener('keydown', (e) => {
+      if (document.activeElement === scratchpadInput) return;
+      if (!resetModal.classList.contains('hidden')) return;
+
+      const key = e.key.toUpperCase();
+      const problem = PROBLEMS[state.currentIndex];
+      const isSolved = Boolean((state.records[problem.id] || {}).status);
+
+      if (['A', 'B', 'C', 'D', 'E'].includes(key) && !isSolved) {
+        state.selectedOption = LETTERS.indexOf(key);
+        renderCurrentProblem();
+      } else if (e.key === 'Enter' && !isSolved && state.selectedOption !== null) {
+        e.preventDefault();
+        handleSubmit();
+      } else if (e.key === 'ArrowLeft') {
+        goToProblem(state.currentIndex - 1);
+      } else if (e.key === 'ArrowRight') {
+        goToProblem(state.currentIndex + 1);
+      }
+    });
+
+    // Initialize App on Load
+    window.addEventListener('DOMContentLoaded', () => {
+      ensureDailySet();
+      applyScratchpadLayout();
+      updateStatsHeader();
+      renderQuestionGrid();
+      renderCurrentProblem();
+
+      // Re-run KaTeX once defer scripts finish loading
+      setTimeout(() => renderMath(document.body), 150);
+    });
+  </script>
+</body>
+</html>
